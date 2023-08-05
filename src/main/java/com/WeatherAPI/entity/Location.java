@@ -7,6 +7,8 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "locations", indexes = {
@@ -51,6 +53,8 @@ public class Location {
     @JsonIgnore
     private RealTimeWeather realTimeWeather;
 
+    @OneToMany(mappedBy = "id.location")
+    private List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
 
     public Location(String cityName, String regionName, String countryName, String countryCode) {
         this.cityName = cityName;
