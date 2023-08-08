@@ -28,13 +28,13 @@ public class GeoLocationService {
     public Location getLocationFromIpAddress(String ipAddress) throws GeoLocationException {
         try {
             IPResult result = ipLocator.IPQuery(ipAddress);
-
+            LOGGER.info(result.toString());
             if(!"OK".equals(result.getStatus())){
                 throw new GeoLocationException("GeoLocation failed with status " + result.getStatus());
             }
             return new Location(result.getCity(), result.getRegion(), result.getCountryLong(),result.getCountryShort());
         } catch (IOException ex) {
-            throw new GeoLocationException("Error querying IP database", ex);
+            throw new  GeoLocationException("Error querying IP database", ex);
         }
     }
 }

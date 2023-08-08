@@ -40,7 +40,8 @@ public class RealTimeWeather {
 
     @OneToOne
     @JoinColumn(name = "location_code")
-    @MapsId
+    @MapsId  // To make same id as Location
+    @JsonIgnore
     private Location location;
 
     public void setLocation(Location location){

@@ -11,6 +11,9 @@ import java.util.Date;
 @Getter @Setter
 public class RealTimeWeatherDto {
 
+    // ModleMapper map Location(reference) of RealTimeWeather to this location(String)
+    // Because they have same name, Since we can't directly map reference to String
+    // So we override the toString() method Location
     private String location;
     private int temperature;
     private int humidity;

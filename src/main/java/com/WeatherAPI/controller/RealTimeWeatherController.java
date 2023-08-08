@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.convert.Jsr310Converters;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +34,11 @@ public class RealTimeWeatherController {
         System.out.println("Client IP Address is " + ipAddress);
 
         try {
-            Location locationFromIpAddress = geoLocationService.getLocationFromIpAddress(ipAddress);
+            Location locationFromIpAddress = geoLocationService.  getLocationFromIpAddress(ipAddress);
             System.out.println("Location From IP Address" + locationFromIpAddress);
-            RealTimeWeather realTimeWeather = realTimeWeatherService.getLocation(locationFromIpAddress);
+
+            // Weather we have real Time data about this particular location otherwise throw LocationNotFoundException
+            RealTimeWeather realTimeWeather = realTimeWeatherService.getByLocation(locationFromIpAddress);
 
             RealTimeWeatherDto weatherDto = modelMapper.map(realTimeWeather, RealTimeWeatherDto.class);
             return ResponseEntity.ok(weatherDto);

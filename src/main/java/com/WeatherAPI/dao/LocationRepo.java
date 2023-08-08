@@ -13,7 +13,7 @@ public interface LocationRepo extends JpaRepository<Location, String> {
     List<Location> findUntrashed();
 
     @Query("SELECT l FROM Location l WHERE l.trashed = false AND l.code = ?1")
-    Location findByCode(String code);
+    Location  findByCode(String code);
 
     @Query("UPDATE Location SET trashed = true WHERE code = ?1")
     @Modifying

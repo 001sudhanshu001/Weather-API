@@ -34,10 +34,9 @@ public class LocationApiController {
     @GetMapping
     public ResponseEntity<?> getAll(){
         List<Location> locations = service.list();
-        System.out.println(locations);
 
         if(locations.isEmpty()){
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build(); // status code 204
         }
         return new ResponseEntity<>(locations, HttpStatus.OK);
     }

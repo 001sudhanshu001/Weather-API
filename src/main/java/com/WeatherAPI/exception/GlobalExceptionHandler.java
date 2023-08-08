@@ -30,7 +30,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ErrorDTO handlleGenericException(HttpServletRequest request, Exception ex){
+    public ErrorDTO handleGenericException(HttpServletRequest request, Exception ex){
         ErrorDTO errorDTO = new ErrorDTO();
 
         errorDTO.setTimestamp(new Date());
@@ -41,7 +41,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.error(ex.getMessage(), ex);
 
         return errorDTO;
-    }/*
+    }
+      /*
      @ExceptionHandler(MethodArgumentNotValidException.class) // provided by Spring
      public ResponseEntity<Map<String, String>> handelMethodArgumentNotValidException(MethodArgumentNotValidException ex){
         Map<String,String> resp = new HashMap<>();

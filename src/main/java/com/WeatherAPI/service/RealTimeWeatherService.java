@@ -17,7 +17,7 @@ public class RealTimeWeatherService {
     private final RealTimeWeatherRepo realTimeWeatherRepo;
     private final LocationRepo locationRepo;
 
-    public RealTimeWeather getLocation(Location location) throws LocationNotFoundException {
+    public RealTimeWeather getByLocation(Location location) throws LocationNotFoundException {
         String countryCode = location.getCountryCode();
         String cityName = location.getCityName();
 
