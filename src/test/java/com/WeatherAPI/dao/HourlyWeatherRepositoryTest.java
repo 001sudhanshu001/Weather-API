@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -51,5 +52,25 @@ class HourlyWeatherRepositoryTest {
 
         assertThat(result).isNotPresent();
 
+    }
+
+    @Test
+    public void testFindByLocationCodeFound() {
+        String locationCode = "MUB";
+        int currentHour = 7;
+
+        List<HourlyWeather> hourlyWeatherList = hourlyRepo.findByLocationCode(locationCode, currentHour);
+
+        assertThat(hourlyWeatherList.size()).isGreaterThan(0);
+    }
+
+    @Test
+    public void testFindByLocationCodeNotFound() {
+        String locationCode = "DELHI";
+        int currentHour = 15;
+
+        List<HourlyWeather> hourlyWeatherList = hourlyRepo.findByLocationCode(locationCode, currentHour);
+
+        assertThat(hourlyWeatherList.size()).isEqualTo(0);
     }
 }

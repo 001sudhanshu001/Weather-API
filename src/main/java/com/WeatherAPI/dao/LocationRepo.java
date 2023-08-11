@@ -18,4 +18,9 @@ public interface LocationRepo extends JpaRepository<Location, String> {
     @Query("UPDATE Location SET trashed = true WHERE code = ?1")
     @Modifying
     void trashedByCode(String code);
+
+    @Query("SELECT l FROM Location l WHERE l.countryCode = ?1 AND l.cityName = ?2 AND l.trashed = false")
+    Location findByCountryNameAndCityName(String countryCode, String cityName);
+
+
 }

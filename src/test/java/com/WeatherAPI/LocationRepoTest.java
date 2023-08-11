@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -140,5 +141,28 @@ public class LocationRepoTest {
         Location updatedLocation = locationRepo.save(location);
 
         assertThat(updatedLocation.getHourlyWeatherList().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void testFindByCountryCodeAndCityNotFound() {
+        String countryCode = "KLJ";
+        String cityName = "city";
+
+        Location location = locationRepo.findByCountryNameAndCityName(countryCode, cityName);
+
+        assertThat(location).isNull();
+    }
+
+    @Test
+    public void testFindByCountryCodeAndCityFound() {
+        String countryCode = "IN";
+        String cityName = "DELHI";
+
+        Location location = locationRepo.findByCountryNameAndCityName(countryCode, cityName);
+
+        assertThat(location).isNotNull();
+        assertThat(location.getCountryCode()).isEqualTo(countryCode);
+        assertThat(location.getCode()).isEqualTo(cityName);
+        System.out.println(location);
     }
 }
