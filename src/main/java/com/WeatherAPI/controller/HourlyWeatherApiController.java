@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +30,7 @@ public class HourlyWeatherApiController {
 
     private final ModelMapper modelMapper;
 
-    @GetMapping
+    @GetMapping         //request is required to get ip and hour of the day
     public ResponseEntity<?> listHourlyForcastByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIpAddress(request);
 
@@ -39,7 +40,7 @@ public class HourlyWeatherApiController {
 
             Location locationFromIp = geoLocationService.getLocationFromIpAddress(ipAddress);
 
-            List<HourlyWeather> hourlyForcast = hourlyWeatherService.getByLocationCode(locationFromIp, currentHour);
+            List<HourlyWeather> hourlyForcast = hourlyWeatherService.getByLocation(locationFromIp, currentHour);
 
             if(hourlyForcast.isEmpty()){
                 return ResponseEntity.noContent().build();
@@ -52,6 +53,27 @@ public class HourlyWeatherApiController {
             return ResponseEntity.notFound().build();
         }
 
+    }
+
+    @GetMapping("/{locationCode}") //request is required to get hour of the day
+    public ResponseEntity<?> listHourlyForecastByLcoationCode(@PathVariable("locationCode") String locationCode,
+                                                              HttpServletRequest request) {
+        try{
+            int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
+
+            List<HourlyWeather> hourlyForecast = hourlyWeatherService.getByLocationCode(locationCode, currentHour);
+
+            if(hourlyForecast.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            return ResponseEntity.ok(listEntity2DTO(hourlyForecast));
+
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     private HourlyWeatherListDto listEntity2DTO(List<HourlyWeather> hourlyForecast){
