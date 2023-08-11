@@ -22,5 +22,4 @@ public interface LocationRepo extends JpaRepository<Location, String> {
     @Query("SELECT l FROM Location l WHERE l.countryCode = ?1 AND l.cityName = ?2 AND l.trashed = false")
     Location findByCountryNameAndCityName(String countryCode, String cityName);
 
-
 }

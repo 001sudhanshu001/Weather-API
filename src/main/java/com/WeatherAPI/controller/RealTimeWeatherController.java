@@ -29,9 +29,7 @@ public class RealTimeWeatherController {
 
     @GetMapping
     public ResponseEntity<?> getRealTimeWeatherByIPAddress(HttpServletRequest request){
-        String ipAddress = CommonUtility.getIpAddress(request); // Getting Ip from Request
-        System.out.println("***********************************");
-        System.out.println("Client IP Address is " + ipAddress);
+        String ipAddress = CommonUtility.getIpAddress(request);
 
         try {
             Location locationFromIpAddress = geoLocationService.  getLocationFromIpAddress(ipAddress);
