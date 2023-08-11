@@ -1,0 +1,55 @@
+package com.WeatherAPI.dao;
+
+import com.WeatherAPI.entity.HourlyWeather;
+import com.WeatherAPI.entity.HourlyWeatherId;
+import com.WeatherAPI.entity.Location;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.Rollback;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Rollback(value = false)
+class HourlyWeatherRepositoryTest {
+    @Autowired
+    private HourlyWeatherRepository hourlyRepo;
+
+    @Test
+    public void testAdd() {
+        String locationCode = "DELHI";
+        Location location = new Location().code(locationCode); // we will get just location object location From DB
+
+        int hourOfDay = 10;
+        HourlyWeather forecast = new HourlyWeather()
+                .location(location)
+                .hourOfDay(hourOfDay)
+                .temperature(23)
+                .precipitation(60)
+                .status("Thunder Storm");
+
+        HourlyWeather updatedForcast = hourlyRepo.save(forecast);
+
+        assertThat(updatedForcast.getId().getLocation().getCode()).isEqualTo(locationCode);
+        assertThat(updatedForcast.getId().getHourOfDay()).isEqualTo(hourOfDay);
+    }
+
+    @Test
+    public void testDelete() {
+        Location location = new Location().code("DELHI");
+
+        HourlyWeatherId id = new HourlyWeatherId(11, location);
+
+        hourlyRepo.deleteById(id);
+
+        Optional<HourlyWeather> result = hourlyRepo.findById(id);
+
+        assertThat(result).isNotPresent();
+
+    }
+}

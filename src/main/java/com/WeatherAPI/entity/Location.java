@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -59,7 +60,7 @@ public class   Location {
     @JsonIgnore
     private RealTimeWeather realTimeWeather;
 
-    @OneToMany(mappedBy = "id.location")
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL) // One Location will have weather info for more than one hour
     private List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
 
     public Location(String cityName, String regionName, String countryName, String countryCode) {
@@ -87,6 +88,12 @@ public class   Location {
     @Override
     public int hashCode() {
         return code.hashCode();
+    }
+
+    // Builder
+    public Location code(String code){
+        setCode(code);
+        return this;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.WeatherAPI;
 
 import com.WeatherAPI.dao.LocationRepo;
+import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -26,18 +28,17 @@ public class LocationRepoTest {
     @Test
     public void testAddSuccess(){
         Location location = new Location();
-        location.setCode("NY_State");
-        location.setCityName("New York State");
-        location.setRegionName("New York");
-        location.setCountryCode("US");
-        location.setCountryName("United States of America");
+        location.setCode("MUB");
+        location.setCityName("Mumbai");
+        location.setRegionName("Maharashtra");
+        location.setCountryCode("IN");
+        location.setCountryName("India");
         location.setEnabled(true);
-        location.setTrashed(true);
 
         Location savedLocation = locationRepo.save(location);
 
         assertThat(savedLocation).isNotNull();
-        assertThat(savedLocation.getCode()).isEqualTo("NY_State");
+        assertThat(savedLocation.getCode()).isEqualTo("MUB");
     }
 
     @Test
@@ -110,5 +111,34 @@ public class LocationRepoTest {
         Location updatedLocation = locationRepo.save(location);
 
         assertThat(updatedLocation.getRealTimeWeather().getLocationCode()).isEqualTo(code);
+    }
+
+    @Test
+    public void testAddHourlyData() {
+        Location location = locationRepo.findByCode("DELHI");
+
+        List<HourlyWeather> hourlyWeatherList = location.getHourlyWeatherList();
+
+        HourlyWeather forecast1 = new HourlyWeather()
+                .location(location)
+                .hourOfDay(11)
+                .temperature(28)
+                .precipitation(40)
+                .status("cloudy");
+
+        HourlyWeather forecast2 = new HourlyWeather()
+                .location(location)
+                .hourOfDay(12)
+                .temperature(30)
+                .precipitation(45)
+                .status("cloudy");
+
+        hourlyWeatherList.add(forecast1);
+        hourlyWeatherList.add(forecast2);
+
+        // we are saving parent object, we have done casacde Type All in Location class
+        Location updatedLocation = locationRepo.save(location);
+
+        assertThat(updatedLocation.getHourlyWeatherList().size()).isEqualTo(2);
     }
 }
