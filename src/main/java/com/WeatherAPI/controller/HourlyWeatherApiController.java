@@ -5,6 +5,7 @@ import com.WeatherAPI.dto.HourlyWeatherDto;
 import com.WeatherAPI.dto.HourlyWeatherListDto;
 import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
+import com.WeatherAPI.exception.BadRequestException;
 import com.WeatherAPI.exception.GeoLocationException;
 import com.WeatherAPI.exception.LocationNotFoundException;
 import com.WeatherAPI.service.GeoLocationService;
@@ -13,17 +14,18 @@ import com.WeatherAPI.utils.CommonUtility;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/v1/hourly")
 @RequiredArgsConstructor
+@Validated // So that HourlyWeatherDto provided in the list as JSON can be validate
 public class HourlyWeatherApiController {
     private  final HourlyWeatherService hourlyWeatherService;
     private final GeoLocationService geoLocationService;
@@ -55,7 +57,9 @@ public class HourlyWeatherApiController {
 
     }
 
-    @GetMapping("/{locationCode}") //request is required to get hour of the day
+    //request is required to get hour of the day. This method will return the Weather of upcoming hours
+    // i.e. if current hour is 5 then it will then it will return the Weather after 5 hours
+    @GetMapping("/{locationCode}")
     public ResponseEntity<?> listHourlyForecastByLcoationCode(@PathVariable("locationCode") String locationCode,
                                                               HttpServletRequest request) {
         try{
@@ -90,4 +94,36 @@ public class HourlyWeatherApiController {
         return listDto;
     }
 
+
+    @PutMapping("/{locationCode}")
+    public ResponseEntity<?> updateHourlyForecast(@PathVariable("locationCode") String locationCode,
+                        @RequestBody @Valid List<HourlyWeatherDto> listDto) throws BadRequestException {
+
+        if(listDto.isEmpty()){
+           throw new BadRequestException("Hourly Forecast Data can't be empty");
+        }
+
+        List<HourlyWeather> hourlyWeathersEntity = listDto2Entity(listDto);
+
+        try {
+            List<HourlyWeather> updatedHourlyWeather =
+                    hourlyWeatherService.updateByLocationCode(locationCode, hourlyWeathersEntity);
+
+            return ResponseEntity.ok(listEntity2DTO(updatedHourlyWeather));
+
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    private List<HourlyWeather> listDto2Entity(List<HourlyWeatherDto> listDto) {
+        List<HourlyWeather> listEntity = new ArrayList<>();
+
+        listDto.forEach(dto -> {
+            listEntity.add(modelMapper.map(dto, HourlyWeather.class));
+        });
+
+        return listEntity;
+    }
 }

@@ -8,6 +8,7 @@ import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,5 +42,35 @@ public class HourlyWeatherService {
 
     }
 
+    public List<HourlyWeather> updateByLocationCode(String locationCode, List<HourlyWeather> hourlyWeatherInRequest)
+                                    throws LocationNotFoundException {
+
+        Location location = locationRepo.findByCode(locationCode);
+
+        if(location == null){
+            throw new LocationNotFoundException("No Location Found with the given code");
+        }
+
+        // Setting locationCode for each HourlyWeather
+        for (HourlyWeather item : hourlyWeatherInRequest) {
+            item.getId().setLocation(location);
+        }
+
+        // While Updating we will remove old
+        List<HourlyWeather> hourlyWeatherInDB = location.getHourlyWeatherList();
+        List<HourlyWeather> hourlyWeatherToBeRemvoved = new ArrayList<>();
+
+        for(HourlyWeather item : hourlyWeatherInDB) {
+            if(!hourlyWeatherInRequest.contains(item)) {
+                hourlyWeatherToBeRemvoved.add(item.getShallowCopy());
+            }
+        }
+
+        for (HourlyWeather item : hourlyWeatherToBeRemvoved) {
+            hourlyWeatherInDB.remove(item);
+        }
+
+        return hourlyRepo.saveAll(hourlyWeatherInRequest);
+    }
 
 }

@@ -2,12 +2,13 @@ package com.WeatherAPI.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,8 @@ public class   Location {
     private String countryCode;
 
     private boolean enabled;
-    @JsonIgnore // This won't be sent into JSON
+
+    @JsonIgnore
     private boolean trashed;
     // Locations will not be deleted permanently , they will be marked as trashed if needed
 
@@ -60,7 +62,7 @@ public class   Location {
     @JsonIgnore
     private RealTimeWeather realTimeWeather;
 
-    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL) // One Location will have weather info for more than one hour
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL, orphanRemoval = true) // One Location will have weather info for more than one hour
     private List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
 
     public Location(String cityName, String regionName, String countryName, String countryCode) {
@@ -96,5 +98,3 @@ public class   Location {
         return this;
     }
 }
-
-

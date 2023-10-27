@@ -54,9 +54,7 @@ public class LocationService {
     }
 
     public void delete(String code) throws LocationNotFoundException {
-        Location location = locationRepo.findByCode(code);
-
-        if(location == null){
+        if(!locationRepo.existsById(code)){
             throw new LocationNotFoundException("No Location found with the given code :" + code);
         }
         locationRepo.trashedByCode(code);

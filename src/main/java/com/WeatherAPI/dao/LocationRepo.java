@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LocationRepo extends JpaRepository<Location, String> {
     @Query("SELECT l FROM Location l WHERE l.trashed = false")

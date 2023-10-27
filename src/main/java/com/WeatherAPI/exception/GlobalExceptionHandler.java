@@ -1,7 +1,6 @@
 package com.WeatherAPI.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +14,16 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+//    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -38,10 +36,88 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         errorDTO.addError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         errorDTO.setPath(request.getServletPath());
 
-        LOGGER.error(ex.getMessage(), ex);
+        log.error(ex.getMessage(), ex);
 
         return errorDTO;
     }
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleBadRequestException(HttpServletRequest request, Exception ex){
+        ErrorDTO errorDTO = new ErrorDTO();
+
+        errorDTO.setTimestamp(new Date());
+        errorDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDTO.addError(ex.getMessage());
+        errorDTO.setPath(request.getServletPath());
+
+        log.error(ex.getMessage(), ex);
+
+        return errorDTO;
+    }
+
+    @ExceptionHandler(LocationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ErrorDTO handleLocationNotFoundExceptionException(HttpServletRequest request, Exception ex){
+        ErrorDTO errorDTO = new ErrorDTO();
+
+        errorDTO.setTimestamp(new Date());
+        errorDTO.setStatus(HttpStatus.NOT_FOUND.value());
+        errorDTO.addError(ex.getMessage());
+        errorDTO.setPath(request.getServletPath());
+
+        log.error(ex.getMessage(), ex);
+
+        return errorDTO;
+    }
+
+//    @ExceptionHandler(ConstraintViolationException.class) // From javax.validation
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ResponseBody
+//    public ErrorDTO handleConstraintViolationException(HttpServletRequest request, Exception ex){
+//        ErrorDTO errorDTO = new ErrorDTO();
+//
+//        errorDTO.setTimestamp(new Date());
+//        errorDTO.setStatus(HttpStatus.BAD_REQUEST.value());
+//        errorDTO.setPath(request.getServletPath());
+//
+//        ConstraintViolationException violationException = (ConstraintViolationException)ex;
+//
+//        var constraintViolations = violationException.getConstraintViolations();
+//        // This exception will be invoked by List<HourlyWeather> so we have to do this for every
+//        constraintViolations.forEach(constraint -> {
+//            errorDTO.addError(constraint.getPropertyPath() + " : " + constraint.getMessage());
+//        });
+//
+//        LOGGER.error(ex.getMessage(), ex);
+//
+//        return errorDTO;
+//    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleConstraintViolationException(HttpServletRequest request, Exception ex) {
+        ErrorDTO error = new ErrorDTO();
+
+        ConstraintViolationException violationException = (ConstraintViolationException) ex;
+
+        error.setTimestamp(new Date());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setPath(request.getServletPath());
+
+        var constraintViolations = violationException.getConstraintViolations();
+
+        constraintViolations.forEach(constraint -> {
+            error.addError(constraint.getPropertyPath() + ": " + constraint.getMessage());
+        });
+
+        log.error(ex.getMessage(), ex);
+
+        return error;
+    }
+
       /*
      @ExceptionHandler(MethodArgumentNotValidException.class) // provided by Spring
      public ResponseEntity<Map<String, String>> handelMethodArgumentNotValidException(MethodArgumentNotValidException ex){

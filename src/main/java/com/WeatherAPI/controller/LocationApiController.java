@@ -21,13 +21,13 @@ public class LocationApiController {
 
     @PostMapping
     public ResponseEntity<?>  addLocation(@RequestBody @Valid Location location){
-        Location addedLocation = null;
+        Location addedLocation;
         try {
             addedLocation = service.addLocation(location);
         } catch (CodeConflictException e) {
             return new ResponseEntity<>("This code is already used for other city",HttpStatus.CONFLICT);
         }
-        URI uri = URI.create("/v1/locations" + addedLocation.getCode());
+        URI uri = URI.create("/v1/location/" + addedLocation.getCode());
         return ResponseEntity.created(uri).body(addedLocation);
     }
 

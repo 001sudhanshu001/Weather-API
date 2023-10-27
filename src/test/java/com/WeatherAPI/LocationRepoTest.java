@@ -5,14 +5,11 @@ import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
-import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -60,18 +57,14 @@ public class LocationRepoTest {
 
     @Test
     public void testGetFound(){
-        String code = "NY_State";
+        String code = "MUB";
         Location location = locationRepo.findByCode(code);
 
         assertThat(location).isNotNull();
         assertThat(location.getCode()).isEqualTo(code);
     }
 
-    @Test
-    public void testGetShouldReturn405MethodNotAllowed() {
-      //  String requestURI = END_POINT_PATH + "/ABCDE";
 
-    }
     @Test
     public void testGetShouldReturn404NotFound() {
         //  String requestURI = END_POINT_PATH + "/ABCDE";
