@@ -149,13 +149,66 @@ public class LocationRepoTest {
     @Test
     public void testFindByCountryCodeAndCityFound() {
         String countryCode = "IN";
-        String cityName = "DELHI";
+        String cityName = "Mumbai";
 
         Location location = locationRepo.findByCountryNameAndCityName(countryCode, cityName);
 
         assertThat(location).isNotNull();
         assertThat(location.getCountryCode()).isEqualTo(countryCode);
-        assertThat(location.getCode()).isEqualTo(cityName);
+        assertThat(location.getCityName()).isEqualTo(cityName);
         System.out.println(location);
+    }
+
+    @Test
+    public void testAddRealtimeWeatherData() {
+        String locationCode = "MUB";
+
+        Location location = locationRepo.findByCode(locationCode);
+
+        RealTimeWeather realTimeWeather = location.getRealTimeWeather();
+
+        if(realTimeWeather == null) {
+            realTimeWeather = new RealTimeWeather();
+            realTimeWeather.setLocation(location);
+
+            location.setRealTimeWeather(realTimeWeather);
+        }
+
+        realTimeWeather.setTemperature(10);
+        realTimeWeather.setHumidity(60);
+        realTimeWeather.setPrecipitation(70);
+        realTimeWeather.setStatus("Cloudy");
+        realTimeWeather.setWindSpeed(10);
+        realTimeWeather.setLastUpdated(new Date());
+
+        Location updatedLocation = locationRepo.save(location);
+
+        assertThat(updatedLocation.getRealTimeWeather().getLocationCode()).isEqualTo(locationCode);
+    }
+
+    @Test
+    public void testAddHourlyWeatherData() {
+        Location location = locationRepo.findById("MUB").get();
+        List<HourlyWeather> hourlyWeatherList = location.getHourlyWeatherList();
+
+        HourlyWeather forecast1 =
+                new HourlyWeather().id(location, 8) // This is Composite key having location and Hour of the Day
+                        .temperature(20)
+                        .precipitation(55)
+                        .status("Nice");
+
+        HourlyWeather forecast2 =
+                new HourlyWeather().id(location, 9) // This is Composite key having location and Hour of the Day
+                        .temperature(21)
+                        .precipitation(50)
+                        .status("Cool");
+
+        hourlyWeatherList.add(forecast1);
+        hourlyWeatherList.add(forecast2);
+
+        // Cascade Type All in Location so the HourlyWeather Objects will also be Persisted
+        Location updatedLocation = locationRepo.save(location);
+
+        assertThat(updatedLocation.getHourlyWeatherList()).isNotNull();
     }
 }

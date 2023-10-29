@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 
 @Getter @Setter
-@JsonPropertyOrder({"hour_of_day", "temperature", "precipitation", "status "})
+@JsonPropertyOrder({"hour_of_day", "temperature", "precipitation", "status"})
 @ToString
 public class HourlyWeatherDto {
     @JsonProperty("hour_of_day")

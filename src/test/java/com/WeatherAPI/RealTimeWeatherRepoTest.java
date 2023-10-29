@@ -21,13 +21,13 @@ public class RealTimeWeatherRepoTest {
 
     @Test
     public void testUpdate() {
-        String code = "BLR";
+        String code = "MUB";
         RealTimeWeather realTimeWeather = repo.findById(code).get();
 
         realTimeWeather.setTemperature(30);
         realTimeWeather.setHumidity(65);
         realTimeWeather.setPrecipitation(95);
-        realTimeWeather.setStatus("cloudy");
+        realTimeWeather.setStatus("Windy");
         realTimeWeather.setWindSpeed(40);
         realTimeWeather.setLastUpdated(new Date());
 
@@ -49,7 +49,7 @@ public class RealTimeWeatherRepoTest {
     @Test
     public void testFindByCountryCodeAndCityFound(){
         String countryCode = "IN";
-        String cityName = "Banglore";
+        String cityName = "Mumbai";
 
         RealTimeWeather realTimeWeather = repo.findByCountryCodeAndCity(countryCode, cityName);
         System.out.println(realTimeWeather);
@@ -67,7 +67,7 @@ public class RealTimeWeatherRepoTest {
 
     @Test
     public void testFindByLocationFound() {
-        String locationCode = "BLR";
+        String locationCode = "MUB";
         RealTimeWeather realTimeWeather = repo.findByLocationCode(locationCode);
         System.out.println(realTimeWeather);
 

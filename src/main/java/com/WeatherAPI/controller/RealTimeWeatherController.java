@@ -32,7 +32,7 @@ public class RealTimeWeatherController {
         String ipAddress = CommonUtility.getIpAddress(request);
 
         try {
-            Location locationFromIpAddress = geoLocationService.  getLocationFromIpAddress(ipAddress);
+            Location locationFromIpAddress = geoLocationService.getLocationFromIpAddress(ipAddress);
             System.out.println("Location From IP Address" + locationFromIpAddress);
 
             // Weather we have real Time data about this particular location otherwise throw LocationNotFoundException
@@ -48,7 +48,6 @@ public class RealTimeWeatherController {
             LOGGER.error(e.getMessage(), e);
             return ResponseEntity.notFound().build();
         }
-
     }
 
     @GetMapping("/{locationCode}")

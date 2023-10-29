@@ -33,21 +33,20 @@ public class HourlyWeatherApiController {
     private final ModelMapper modelMapper;
 
     @GetMapping         //request is required to get ip and hour of the day
-    public ResponseEntity<?> listHourlyForcastByIPAddress(HttpServletRequest request) {
+    public ResponseEntity<?> listHourlyForecastByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIpAddress(request);
 
         try {
             // Fetching hour of the day from the header
             int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));// This can throw NumberFormatException if header is null
-
             Location locationFromIp = geoLocationService.getLocationFromIpAddress(ipAddress);
 
-            List<HourlyWeather> hourlyForcast = hourlyWeatherService.getByLocation(locationFromIp, currentHour);
+            List<HourlyWeather> hourlyForecast = hourlyWeatherService.getByLocation(locationFromIp, currentHour);
 
-            if(hourlyForcast.isEmpty()){
+            if(hourlyForecast.isEmpty()){
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(listEntity2DTO(hourlyForcast));
+            return ResponseEntity.ok(listEntity2DTO(hourlyForecast));
 
         } catch (GeoLocationException | NumberFormatException e) {
             return ResponseEntity.badRequest().build();
@@ -60,7 +59,7 @@ public class HourlyWeatherApiController {
     //request is required to get hour of the day. This method will return the Weather of upcoming hours
     // i.e. if current hour is 5 then it will then it will return the Weather after 5 hours
     @GetMapping("/{locationCode}")
-    public ResponseEntity<?> listHourlyForecastByLcoationCode(@PathVariable("locationCode") String locationCode,
+    public ResponseEntity<?> listHourlyForecastByLocationCode(@PathVariable("locationCode") String locationCode,
                                                               HttpServletRequest request) {
         try{
             int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
@@ -79,21 +78,6 @@ public class HourlyWeatherApiController {
             return ResponseEntity.badRequest().build();
         }
     }
-
-    private HourlyWeatherListDto listEntity2DTO(List<HourlyWeather> hourlyForecast){
-        Location location = hourlyForecast.get(0).getId().getLocation(); // get Location
-
-        HourlyWeatherListDto listDto = new HourlyWeatherListDto();
-        listDto.setLocation(location.toString());
-
-        hourlyForecast.forEach((hourlyWeather -> {
-            HourlyWeatherDto dto = modelMapper.map(hourlyWeather, HourlyWeatherDto.class);
-            listDto.addWeatherHourlyDto(dto);
-        }));
-
-        return listDto;
-    }
-
 
     @PutMapping("/{locationCode}")
     public ResponseEntity<?> updateHourlyForecast(@PathVariable("locationCode") String locationCode,
@@ -116,6 +100,21 @@ public class HourlyWeatherApiController {
         }
 
     }
+
+    private HourlyWeatherListDto listEntity2DTO(List<HourlyWeather> hourlyForecast){
+        Location location = hourlyForecast.get(0).getId().getLocation(); // get Location
+
+        HourlyWeatherListDto listDto = new HourlyWeatherListDto();
+        listDto.setLocation(location.toString());
+
+        hourlyForecast.forEach((hourlyWeather -> {
+            HourlyWeatherDto dto = modelMapper.map(hourlyWeather, HourlyWeatherDto.class);
+            listDto.addWeatherHourlyDto(dto);
+        }));
+
+        return listDto;
+    }
+
 
     private List<HourlyWeather> listDto2Entity(List<HourlyWeatherDto> listDto) {
         List<HourlyWeather> listEntity = new ArrayList<>();

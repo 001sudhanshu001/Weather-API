@@ -21,7 +21,7 @@ public class HourlyWeatherService {
         String countryCode = location.getCountryCode();
         String cityName = location.getCityName();
 
-        Location locationInDB = locationRepo. findByCountryNameAndCityName(countryCode, cityName);
+        Location locationInDB = locationRepo.findByCountryNameAndCityName(countryCode, cityName);
 
         if(locationInDB == null){
             throw new LocationNotFoundException("No Location Found with the given country code and city name");

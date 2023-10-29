@@ -23,10 +23,10 @@ class HourlyWeatherRepositoryTest {
 
     @Test
     public void testAdd() {
-        String locationCode = "DELHI";
+        String locationCode = "MUB";
         Location location = new Location().code(locationCode); // we will get just location object location From DB
 
-        int hourOfDay = 10;
+        int hourOfDay = 11;
         HourlyWeather forecast = new HourlyWeather()
                 .location(location)
                 .hourOfDay(hourOfDay)
@@ -42,9 +42,9 @@ class HourlyWeatherRepositoryTest {
 
     @Test
     public void testDelete() {
-        Location location = new Location().code("DELHI");
+        Location location = new Location().code("MUB");
 
-        HourlyWeatherId id = new HourlyWeatherId(11, location);
+        HourlyWeatherId id = new HourlyWeatherId(10, location);
 
         hourlyRepo.deleteById(id);
 
@@ -61,6 +61,10 @@ class HourlyWeatherRepositoryTest {
 
         List<HourlyWeather> hourlyWeatherList = hourlyRepo.findByLocationCode(locationCode, currentHour);
 
+        System.out.println("Printing the List :");
+        for(var data : hourlyWeatherList){
+            System.out.println(data);
+        }
         assertThat(hourlyWeatherList.size()).isGreaterThan(0);
     }
 

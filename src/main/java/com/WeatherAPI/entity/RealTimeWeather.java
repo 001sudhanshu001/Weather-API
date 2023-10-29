@@ -29,7 +29,7 @@ public class RealTimeWeather {
     int precipitation;
     @Column(length = 50)
     @NotBlank(message = "Status must not be empty")
-    @Length(min = 3, max = 50, message = "Status must be in between in 3 to 50 characters")
+    @Length(min = 3,  max = 50, message = "Status must be in between in 3 to 50 characters")
     private String status;
     @JsonProperty("wind_speed")
     @Range(min = 0, max = 200, message = "Wind Speed must be in the range 0 to 200 km/h")
