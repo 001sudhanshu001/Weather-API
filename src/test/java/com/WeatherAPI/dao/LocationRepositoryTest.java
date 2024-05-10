@@ -1,6 +1,6 @@
 package com.WeatherAPI;
 
-import com.WeatherAPI.dao.LocationRepo;
+import com.WeatherAPI.dao.LocationRepository;
 import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
@@ -18,9 +18,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(value = false)
-public class LocationRepoTest {
+public class LocationRepositoryTest {
     @Autowired
-    private LocationRepo locationRepo;
+    private LocationRepository locationRepository;
     private static final String END_POINT_PATH = "/v1/location";
 
     @Test
@@ -33,15 +33,15 @@ public class LocationRepoTest {
         location.setCountryName("India");
         location.setEnabled(true);
 
-        Location savedLocation = locationRepo.save(location);
+        Location savedLocation = locationRepository.save(location);
 
         assertThat(savedLocation).isNotNull();
-        assertThat(savedLocation.getCode()).isEqualTo("MUB");
+        assertThat(savedLocation.getCode()).isEqualTo(location.getCode());
     }
 
     @Test
     public void testListSuccess(){
-        List<Location> untrashed = locationRepo.findUntrashed();
+        List<Location> untrashed = locationRepository.findUntrashed();
 
     //    assertThat(untrashed).isNotNull();
         untrashed.forEach(System.out::println);
@@ -50,7 +50,7 @@ public class LocationRepoTest {
     @Test
     public void testGetNotFound(){
         String code = "ABCD";
-        Location location = locationRepo.findByCode(code);
+        Location location = locationRepository.findByCode(code);
 
         assertThat(location).isNull();
     }
@@ -58,7 +58,7 @@ public class LocationRepoTest {
     @Test
     public void testGetFound(){
         String code = "MUB";
-        Location location = locationRepo.findByCode(code);
+        Location location = locationRepository.findByCode(code);
 
         assertThat(location).isNotNull();
         assertThat(location.getCode()).isEqualTo(code);
@@ -74,9 +74,9 @@ public class LocationRepoTest {
     @Test
     public void testTrashedSuccess(){
         String code = "NYC_USA";
-        locationRepo.trashedByCode(code);
+        locationRepository.trashedByCode(code);
 
-        Location location = locationRepo.findByCode(code);// this should be null after trashed
+        Location location = locationRepository.findByCode(code);// this should be null after trashed
 
         assertThat(location).isNull();
     }
@@ -85,7 +85,7 @@ public class LocationRepoTest {
     public void testAddRealTimeWeatherData() {
         String code = "BLR";
 
-        Location location = locationRepo.findByCode(code);
+        Location location = locationRepository.findByCode(code);
 
         RealTimeWeather realTimeWeather = location.getRealTimeWeather();
 
@@ -102,14 +102,14 @@ public class LocationRepoTest {
         realTimeWeather.setWindSpeed(40);
         realTimeWeather.setLastUpdated(new Date());
 
-        Location updatedLocation = locationRepo.save(location);
+        Location updatedLocation = locationRepository.save(location);
 
         assertThat(updatedLocation.getRealTimeWeather().getLocationCode()).isEqualTo(code);
     }
 
     @Test
     public void testAddHourlyData() {
-        Location location = locationRepo.findByCode("DELHI");
+        Location location = locationRepository.findByCode("DELHI");
 
         List<HourlyWeather> hourlyWeatherList = location.getHourlyWeatherList();
 
@@ -131,7 +131,7 @@ public class LocationRepoTest {
         hourlyWeatherList.add(forecast2);
 
         // we are saving parent object, we have done casacde Type All in Location class
-        Location updatedLocation = locationRepo.save(location);
+        Location updatedLocation = locationRepository.save(location);
 
         assertThat(updatedLocation.getHourlyWeatherList().size()).isEqualTo(2);
     }
@@ -141,7 +141,7 @@ public class LocationRepoTest {
         String countryCode = "KLJ";
         String cityName = "city";
 
-        Location location = locationRepo.findByCountryNameAndCityName(countryCode, cityName);
+        Location location = locationRepository.findByCountryNameAndCityName(countryCode, cityName);
 
         assertThat(location).isNull();
     }
@@ -151,7 +151,7 @@ public class LocationRepoTest {
         String countryCode = "IN";
         String cityName = "Mumbai";
 
-        Location location = locationRepo.findByCountryNameAndCityName(countryCode, cityName);
+        Location location = locationRepository.findByCountryNameAndCityName(countryCode, cityName);
 
         assertThat(location).isNotNull();
         assertThat(location.getCountryCode()).isEqualTo(countryCode);
@@ -163,7 +163,7 @@ public class LocationRepoTest {
     public void testAddRealtimeWeatherData() {
         String locationCode = "MUB";
 
-        Location location = locationRepo.findByCode(locationCode);
+        Location location = locationRepository.findByCode(locationCode);
 
         RealTimeWeather realTimeWeather = location.getRealTimeWeather();
 
@@ -181,14 +181,14 @@ public class LocationRepoTest {
         realTimeWeather.setWindSpeed(10);
         realTimeWeather.setLastUpdated(new Date());
 
-        Location updatedLocation = locationRepo.save(location);
+        Location updatedLocation = locationRepository.save(location);
 
         assertThat(updatedLocation.getRealTimeWeather().getLocationCode()).isEqualTo(locationCode);
     }
 
     @Test
     public void testAddHourlyWeatherData() {
-        Location location = locationRepo.findById("MUB").get();
+        Location location = locationRepository.findById("MUB").get();
         List<HourlyWeather> hourlyWeatherList = location.getHourlyWeatherList();
 
         HourlyWeather forecast1 =
@@ -207,7 +207,7 @@ public class LocationRepoTest {
         hourlyWeatherList.add(forecast2);
 
         // Cascade Type All in Location so the HourlyWeather Objects will also be Persisted
-        Location updatedLocation = locationRepo.save(location);
+        Location updatedLocation = locationRepository.save(location);
 
         assertThat(updatedLocation.getHourlyWeatherList()).isNotNull();
     }
