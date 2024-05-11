@@ -1,6 +1,6 @@
 package com.WeatherAPI.exception;
 
-public class GeoLocationException extends Exception{
+public class GeoLocationException extends RuntimeException{
     public GeoLocationException(String message) {
         super(message);
     }

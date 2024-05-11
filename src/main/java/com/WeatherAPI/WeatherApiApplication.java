@@ -1,6 +1,8 @@
 package com.WeatherAPI;
 
+import com.WeatherAPI.dto.DailyWeatherDTO;
 import com.WeatherAPI.dto.HourlyWeatherDto;
+import com.WeatherAPI.entity.DailyWeather;
 import com.WeatherAPI.entity.HourlyWeather;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -42,6 +44,10 @@ public class WeatherApiApplication {
 		var typeMap2 = mapper.typeMap(HourlyWeatherDto.class, HourlyWeather.class);
 		typeMap2.addMapping(src -> src.getHourOfDay(),
 				(dest, value) ->	dest.getId().setHourOfDay(value != null ? (int) value : 0));
+
+		var typeMap3 = mapper.typeMap(DailyWeather.class, DailyWeatherDTO.class);
+		typeMap3.addMapping(src -> src.getId().getDayOfMonth(), DailyWeatherDTO::setDayOfMonth);
+		typeMap3.addMapping(src -> src.getId().getMonth(), DailyWeatherDTO::setMonth);
 
 		return mapper;
 	}
