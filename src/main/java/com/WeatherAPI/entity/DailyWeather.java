@@ -22,4 +22,37 @@ public class DailyWeather {
     @Column(length = 50)
     private String status;
 
+    // Builder
+    public DailyWeather precipitation(int precipitation){
+        setPrecipitation(precipitation);
+        return this;
+    }
+    public DailyWeather status(String status){
+        setStatus(status);
+        return this;
+    }
+    public DailyWeather location(Location location){
+        this.id.setLocation(location);
+        return this;
+    }
+
+    public DailyWeather dayOfMonth(int day) {
+        this.id.setDayOfMonth(day);
+        return this;
+    }
+
+    public DailyWeather month(int month) {
+        this.id.setMonth(month);
+        return this;
+    }
+
+    public DailyWeather minTemp(int minTemp) {
+        setMinTemp(minTemp);
+        return this;
+    }
+
+    public DailyWeather maxTemp(int maxTemp) {
+        setMaxTemp(maxTemp);
+        return this;
+    }
 }

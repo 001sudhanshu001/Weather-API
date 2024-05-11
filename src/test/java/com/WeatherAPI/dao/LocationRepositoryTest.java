@@ -1,5 +1,6 @@
 package com.WeatherAPI.dao;
 
+import com.WeatherAPI.entity.DailyWeather;
 import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
@@ -222,5 +223,37 @@ public class LocationRepositoryTest {
         Location updatedLocation = locationRepository.save(location);
 
         assertThat(updatedLocation.getHourlyWeatherList()).isNotNull();
+    }
+
+    @Test
+    public void testAddDailyWeatherData() {
+        Location location = locationRepository.findById("MUB").get();
+
+        List<DailyWeather> dailyWeatherList = location.getDailyWeather();
+
+        DailyWeather forcecast1 = new DailyWeather()
+                .location(location)
+                .dayOfMonth(16)
+                .month(5)
+                .minTemp(25)
+                .maxTemp(33)
+                .precipitation(20)
+                .status("Cloudy");
+
+        DailyWeather forcecast2 = new DailyWeather()
+                .location(location)
+                .dayOfMonth(17)
+                .month(5)
+                .minTemp(23)
+                .maxTemp(32)
+                .precipitation(26)
+                .status("Clear");
+
+        dailyWeatherList.add(forcecast1);
+        dailyWeatherList.add(forcecast2);
+
+        Location updatedLocation = locationRepository.save(location);
+
+        assertThat(updatedLocation.getDailyWeather().size()).isGreaterThan(0);
     }
 }
