@@ -14,6 +14,8 @@ import java.io.IOException;
 public class GeoLocationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationService.class);
     private static final String DBPath = "src/main/java/com/WeatherAPI/ip2LocationDB/IP2LOCATION-LITE-DB3.BIN";
+//    private static final String DBPath = "src/main/resources/ip2LocationDB/IP2LOCATION-LITE-DB3.BIN";
+//    private static final String DBPath = "/ip2LocationDB/IP2LOCATION-LITE-DB3.BIN";
     private static final IP2Location ipLocator = new IP2Location();
 
     public GeoLocationService(){

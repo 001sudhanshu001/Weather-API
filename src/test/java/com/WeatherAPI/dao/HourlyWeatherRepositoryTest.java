@@ -27,7 +27,7 @@ class HourlyWeatherRepositoryTest {
         String locationCode = "MUB";
         Location location = new Location().code(locationCode);
 
-        int hourOfDay = 11;
+        int hourOfDay = 10;
         HourlyWeather forecast = new HourlyWeather()
                 .location(location)
                 .hourOfDay(hourOfDay)
