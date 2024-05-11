@@ -1,7 +1,7 @@
-package com.WeatherAPI;
+package com.WeatherAPI.dao;
 
-import com.WeatherAPI.dao.RealTimeWeatherRepo;
 import com.WeatherAPI.entity.RealTimeWeather;
+import com.WeatherAPI.exception.LocationNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -42,7 +42,7 @@ public class RealTimeWeatherRepoTest {
         String countryCode = "JP";
         String cityName = "Tokyo";
 
-        RealTimeWeather realTimeWeather = repo.findByCountryCodeAndCity(countryCode, cityName);
+        RealTimeWeather realTimeWeather = repo.findByCountryCodeAndCity(countryCode, cityName).orElse(null);
         assertThat(realTimeWeather).isNull();
     }
 
@@ -51,8 +51,8 @@ public class RealTimeWeatherRepoTest {
         String countryCode = "IN";
         String cityName = "Mumbai";
 
-        RealTimeWeather realTimeWeather = repo.findByCountryCodeAndCity(countryCode, cityName);
-        System.out.println(realTimeWeather);
+        RealTimeWeather realTimeWeather = repo.findByCountryCodeAndCity(countryCode, cityName).orElse(null);
+
         assertThat(realTimeWeather).isNotNull();
         assertThat(realTimeWeather.getLocation().getCityName()).isEqualTo(cityName);
     }
@@ -60,7 +60,7 @@ public class RealTimeWeatherRepoTest {
     @Test
     public void testFindByLocationNotFound() {
         String locationCode = "ABC";
-        RealTimeWeather realTimeWeather = repo.findByLocationCode(locationCode);
+        RealTimeWeather realTimeWeather = repo.findByLocationCode(locationCode).orElse(null);
 
         assertThat(realTimeWeather).isNull();
     }
@@ -68,7 +68,9 @@ public class RealTimeWeatherRepoTest {
     @Test
     public void testFindByLocationFound() {
         String locationCode = "MUB";
-        RealTimeWeather realTimeWeather = repo.findByLocationCode(locationCode);
+        RealTimeWeather realTimeWeather = repo
+                .findByLocationCode(locationCode)
+                        .orElseThrow(() -> new LocationNotFoundException("No Location found with the given code:" + locationCode));
         System.out.println(realTimeWeather);
 
         assertThat(realTimeWeather).isNotNull();

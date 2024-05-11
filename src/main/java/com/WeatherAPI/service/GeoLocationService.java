@@ -13,8 +13,8 @@ import java.io.IOException;
 @Service
 public class GeoLocationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationService.class);
-    private String DBPath = "src/main/java/com/WeatherAPI/ip2LocationDB/IP2LOCATION-LITE-DB3.BIN";
-    private IP2Location ipLocator = new IP2Location();
+    private static final String DBPath = "src/main/java/com/WeatherAPI/ip2LocationDB/IP2LOCATION-LITE-DB3.BIN";
+    private static final IP2Location ipLocator = new IP2Location();
 
     public GeoLocationService(){
         System.out.println("Object Created for GeoLocationService");
@@ -28,14 +28,12 @@ public class GeoLocationService {
     public Location getLocationFromIpAddress(String ipAddress) throws GeoLocationException {
         try {
             IPResult result = ipLocator.IPQuery(ipAddress);
-            System.out.println(result.getCity());
             LOGGER.info(result.toString());
-            if(!"OK".equals(result.getStatus())){
+            if(!result.getStatus().equals("OK")){
                 throw new GeoLocationException("GeoLocation failed with status " + result.getStatus());
             }
             return new Location(result.getCity(), result.getRegion(), result.getCountryLong(),result.getCountryShort());
         } catch (IOException ex) {
-            System.out.println("GEOOOOOOOOOOOOOOOOo");
             throw new  GeoLocationException("Error querying IP database", ex);
         }
     }

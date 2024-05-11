@@ -21,19 +21,25 @@ public class RealTimeWeather {
     @Column(name = "location_code")
     @JsonIgnore
     private String locationCode;
+
     @Range(min = -50, max = 50, message = "Temperature must be in the range -50 to 50 degree Celsius")
     private int temperature;
+
     @Range(min = 0, max = 100, message = "Humidity must be in the range 0 to 100%")
     private int humidity;
+
     @Range(min = 0, max = 100, message = "Precipitation must be in the range 0 to 100%")
     int precipitation;
+
     @Column(length = 50)
     @NotBlank(message = "Status must not be empty")
     @Length(min = 3,  max = 50, message = "Status must be in between in 3 to 50 characters")
     private String status;
+
     @JsonProperty("wind_speed")
     @Range(min = 0, max = 200, message = "Wind Speed must be in the range 0 to 200 km/h")
     private int windSpeed;
+
     @JsonProperty("last_updated")
     @JsonIgnore
     private Date lastUpdated;

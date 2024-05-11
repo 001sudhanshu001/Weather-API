@@ -18,13 +18,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(value = false)
 class HourlyWeatherRepositoryTest {
+
     @Autowired
     private HourlyWeatherRepository hourlyRepo;
 
     @Test
     public void testAdd() {
         String locationCode = "MUB";
-        Location location = new Location().code(locationCode); // we will get just location object location From DB
+        Location location = new Location().code(locationCode);
 
         int hourOfDay = 11;
         HourlyWeather forecast = new HourlyWeather()
@@ -34,17 +35,17 @@ class HourlyWeatherRepositoryTest {
                 .precipitation(60)
                 .status("Thunder Storm");
 
-        HourlyWeather updatedForcast = hourlyRepo.save(forecast);
+        HourlyWeather updatedForecast = hourlyRepo.save(forecast);
 
-        assertThat(updatedForcast.getId().getLocation().getCode()).isEqualTo(locationCode);
-        assertThat(updatedForcast.getId().getHourOfDay()).isEqualTo(hourOfDay);
+        assertThat(updatedForecast.getId().getLocation().getCode()).isEqualTo(locationCode);
+        assertThat(updatedForecast.getId().getHourOfDay()).isEqualTo(hourOfDay);
     }
 
     @Test
     public void testDelete() {
         Location location = new Location().code("MUB");
 
-        HourlyWeatherId id = new HourlyWeatherId(10, location);
+        HourlyWeatherId id = new HourlyWeatherId(8, location);
 
         hourlyRepo.deleteById(id);
 
@@ -57,7 +58,7 @@ class HourlyWeatherRepositoryTest {
     @Test
     public void testFindByLocationCodeFound() {
         String locationCode = "MUB";
-        int currentHour = 7;
+        int currentHour = 9;
 
         List<HourlyWeather> hourlyWeatherList = hourlyRepo.findByLocationCode(locationCode, currentHour);
 

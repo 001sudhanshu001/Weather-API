@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface HourlyWeatherRepository extends JpaRepository<HourlyWeather, HourlyWeatherId> {
 
-    // Return hourly weather for upcoming hours
+    // Return hourly weather for current and upcoming hours
     @Query("""
 			SELECT h FROM HourlyWeather h WHERE
-			h.id.location.code = ?1 AND h.id.hourOfDay > ?2
+			h.id.location.code = ?1 AND h.id.hourOfDay >= ?2
 			AND h.id.location.trashed = false
 			""")
     List<HourlyWeather> findByLocationCode(String locationCode, int currentHour);

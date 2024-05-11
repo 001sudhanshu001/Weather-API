@@ -1,10 +1,12 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.dto.LocationDto;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.CodeConflictException;
 import com.WeatherAPI.exception.LocationNotFoundException;
 import com.WeatherAPI.service.LocationService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,18 +14,21 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/locations")
 @RequiredArgsConstructor
 public class LocationApiController {
     private final LocationService service;
+    private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<?>  addLocation(@RequestBody @Valid Location location){
-        Location addedLocation;
+    public ResponseEntity<?> addLocation(@RequestBody @Valid LocationDto locationDto){
+        LocationDto addedLocation;
         try {
-            addedLocation = service.addLocation(location);
+            Location location = modelMapper.map(locationDto, Location.class);
+            addedLocation = modelMapper.map(service.addLocation(location), LocationDto.class);
         } catch (CodeConflictException e) {
             return new ResponseEntity<>("This code is already used for other city",HttpStatus.CONFLICT);
         }
@@ -38,7 +43,11 @@ public class LocationApiController {
         if(locations.isEmpty()){
             return ResponseEntity.noContent().build(); // status code 204
         }
-        return new ResponseEntity<>(locations, HttpStatus.OK);
+
+        List<LocationDto> dtoList = locations.stream()
+                .map(location -> modelMapper.map(location, LocationDto.class)).toList();
+
+        return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{code}")
@@ -52,10 +61,12 @@ public class LocationApiController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateByCode(@RequestBody @Valid Location location){
+    public ResponseEntity<?> updateByCode(@RequestBody @Valid LocationDto locationDto){
         try {
+            Location location = modelMapper.map(locationDto, Location.class);
             Location updatedLocation = service.update(location);
-            return ResponseEntity.ok(updatedLocation);
+
+            return ResponseEntity.ok(modelMapper.map(updatedLocation, LocationDto.class));
         } catch (LocationNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

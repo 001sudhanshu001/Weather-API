@@ -57,7 +57,7 @@ public class HourlyWeatherApiController {
     }
 
     //request is required to get hour of the day. This method will return the Weather of upcoming hours
-    // i.e. if current hour is 5 then it will then it will return the Weather after 5 hours
+    // i.e. if current hour is 5 then it will then it will return the Weather after 4 hours
     @GetMapping("/{locationCode}")
     public ResponseEntity<?> listHourlyForecastByLocationCode(@PathVariable("locationCode") String locationCode,
                                                               HttpServletRequest request) {
@@ -102,7 +102,7 @@ public class HourlyWeatherApiController {
     }
 
     private HourlyWeatherListDto listEntity2DTO(List<HourlyWeather> hourlyForecast){
-        Location location = hourlyForecast.get(0).getId().getLocation(); // get Location
+        Location location = hourlyForecast.get(0).getId().getLocation();
 
         HourlyWeatherListDto listDto = new HourlyWeatherListDto();
         listDto.setLocation(location.toString());
@@ -125,4 +125,5 @@ public class HourlyWeatherApiController {
 
         return listEntity;
     }
+
 }

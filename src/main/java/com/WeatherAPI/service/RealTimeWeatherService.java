@@ -1,6 +1,6 @@
 package com.WeatherAPI.service;
 
-import com.WeatherAPI.dao.LocationRepo;
+import com.WeatherAPI.dao.LocationRepository;
 import com.WeatherAPI.dao.RealTimeWeatherRepo;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
@@ -15,45 +15,39 @@ import java.util.Date;
 public class RealTimeWeatherService {
 
     private final RealTimeWeatherRepo realTimeWeatherRepo;
-    private final LocationRepo locationRepo;
+    private final LocationRepository locationRepository;
 
-    public RealTimeWeather getByLocation(Location location) throws LocationNotFoundException {
+    public RealTimeWeather getWeatherByLocation(Location location) throws LocationNotFoundException {
         String countryCode = location.getCountryCode();
         String cityName = location.getCityName();
 
-        RealTimeWeather realTimeWeather = realTimeWeatherRepo.findByCountryCodeAndCity(countryCode, cityName);
-
-        if(realTimeWeather == null){
-            throw new LocationNotFoundException("No Location found with the given country code and city name");
-        }
-        return realTimeWeather;
+        return realTimeWeatherRepo
+                .findByCountryCodeAndCity(countryCode, cityName)
+                .orElseThrow(() ->  new LocationNotFoundException("No Location found with the given country code and city name"));
     }
 
     public RealTimeWeather getByLocationCode(String locationCode) throws LocationNotFoundException {
-        RealTimeWeather byLocationCode = realTimeWeatherRepo.findByLocationCode(locationCode);
 
-        if(byLocationCode == null){
-            throw new LocationNotFoundException("No Location found with the given code:" + locationCode);
-        }
-        return byLocationCode;
+        return realTimeWeatherRepo
+                .findByLocationCode(locationCode)
+                .orElseThrow(() -> new LocationNotFoundException("No Location found with the given code:" + locationCode));
     }
 
     public RealTimeWeather update(String locationCode, RealTimeWeather weather) throws LocationNotFoundException {
-        Location location = locationRepo.findByCode(locationCode);
-        if(location == null){
-            throw new LocationNotFoundException("No Location found with the given code:" + locationCode);
-        }
+        Location location = locationRepository
+                .findByCode(locationCode)
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
+
         // Because in RealTimeWeather we are using JsonIgnore for lastUpdated and location
         weather.setLocation(location);
         weather.setLastUpdated(new Date());
         // This is for those location which does not have realtime Weather data into database, they are just in Location Table
-        // Realtime_weather table mai tabhi toh ja skte mai jab kisi Location ke saath associated ho
         if (location.getRealTimeWeather() == null) { //
             location.setRealTimeWeather(weather);
-            Location updatedLocation = locationRepo.save(location);
-            // Here no need to save the weather explicity because of CASCADE.ALL
+            Location updatedLocation = locationRepository.save(location);
+            // Here no need to save the weather explicitly because of CASCADE.ALL
             return updatedLocation.getRealTimeWeather();
-        } //
+        }
         return realTimeWeatherRepo.save(weather);
     }
 }

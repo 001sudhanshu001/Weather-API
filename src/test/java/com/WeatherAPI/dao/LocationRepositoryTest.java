@@ -1,9 +1,9 @@
-package com.WeatherAPI;
+package com.WeatherAPI.dao;
 
-import com.WeatherAPI.dao.LocationRepository;
 import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
+import com.WeatherAPI.exception.LocationNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -50,7 +50,8 @@ public class LocationRepositoryTest {
     @Test
     public void testGetNotFound(){
         String code = "ABCD";
-        Location location = locationRepository.findByCode(code);
+        Location location = locationRepository
+                .findByCode(code).orElse(null);
 
         assertThat(location).isNull();
     }
@@ -58,8 +59,11 @@ public class LocationRepositoryTest {
     @Test
     public void testGetFound(){
         String code = "MUB";
-        Location location = locationRepository.findByCode(code);
+        Location location = locationRepository
+                .findByCode(code)
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
 
+        System.out.println("Printing Location Details " + location);
         assertThat(location).isNotNull();
         assertThat(location.getCode()).isEqualTo(code);
     }
@@ -76,7 +80,7 @@ public class LocationRepositoryTest {
         String code = "NYC_USA";
         locationRepository.trashedByCode(code);
 
-        Location location = locationRepository.findByCode(code);// this should be null after trashed
+        Location location = locationRepository.findByCode(code).orElse(null);// this should be null after trashed
 
         assertThat(location).isNull();
     }
@@ -85,7 +89,8 @@ public class LocationRepositoryTest {
     public void testAddRealTimeWeatherData() {
         String code = "BLR";
 
-        Location location = locationRepository.findByCode(code);
+        Location location = locationRepository.findByCode(code)
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
 
         RealTimeWeather realTimeWeather = location.getRealTimeWeather();
 
@@ -109,7 +114,8 @@ public class LocationRepositoryTest {
 
     @Test
     public void testAddHourlyData() {
-        Location location = locationRepository.findByCode("DELHI");
+        Location location = locationRepository.findByCode("MUB")
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
 
         List<HourlyWeather> hourlyWeatherList = location.getHourlyWeatherList();
 
@@ -141,7 +147,9 @@ public class LocationRepositoryTest {
         String countryCode = "KLJ";
         String cityName = "city";
 
-        Location location = locationRepository.findByCountryNameAndCityName(countryCode, cityName);
+        Location location = locationRepository
+                .findByCountryNameAndCityName(countryCode, cityName)
+                        .orElse(null);
 
         assertThat(location).isNull();
     }
@@ -151,19 +159,21 @@ public class LocationRepositoryTest {
         String countryCode = "IN";
         String cityName = "Mumbai";
 
-        Location location = locationRepository.findByCountryNameAndCityName(countryCode, cityName);
+        Location location = locationRepository
+                .findByCountryNameAndCityName(countryCode, cityName)
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given country code and city name"));
 
         assertThat(location).isNotNull();
         assertThat(location.getCountryCode()).isEqualTo(countryCode);
         assertThat(location.getCityName()).isEqualTo(cityName);
-        System.out.println(location);
     }
 
     @Test
     public void testAddRealtimeWeatherData() {
         String locationCode = "MUB";
 
-        Location location = locationRepository.findByCode(locationCode);
+        Location location = locationRepository.findByCode(locationCode)
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
 
         RealTimeWeather realTimeWeather = location.getRealTimeWeather();
 
@@ -188,7 +198,9 @@ public class LocationRepositoryTest {
 
     @Test
     public void testAddHourlyWeatherData() {
-        Location location = locationRepository.findById("MUB").get();
+        Location location = locationRepository
+                .findById("MUB")
+                .orElseThrow(() -> new LocationNotFoundException("No Location found with the given ID"));
         List<HourlyWeather> hourlyWeatherList = location.getHourlyWeatherList();
 
         HourlyWeather forecast1 =

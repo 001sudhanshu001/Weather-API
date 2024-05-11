@@ -1,6 +1,7 @@
 package com.WeatherAPI.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,11 +41,13 @@ public class   Location {
     @Length(min = 3, max = 128, message = "Region name must have 3 to 128 characters")
     @JsonProperty("region_name")
     private String regionName;
+
     @Column(length = 64, nullable = false)
     @NotNull(message = "Country name can't be null")
     @Length(min = 3, max = 64, message = "Country name must have 3 to 64 characters")
     @JsonProperty("country_name")
     private String countryName;
+
     @Column(length = 2, nullable = false)
     @NotNull(message = "Country code can't be null")
     @Length(min = 2, max = 2, message = "Country code must have 2 characters")
@@ -63,6 +66,7 @@ public class   Location {
     private RealTimeWeather realTimeWeather;
 
     @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL, orphanRemoval = true) // One Location will have weather info for more than one hour
+    @JsonIgnore
     private List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
 
     public Location(String cityName, String regionName, String countryName, String countryCode) {
@@ -74,7 +78,7 @@ public class   Location {
 
     @Override
     public String toString() {
-        return  cityName + ", " + (regionName != null ? regionName + "," : "") + countryName;
+        return  cityName + ", " + (regionName != null ? regionName + ", " : "") + countryName;
     }
 
     @Override

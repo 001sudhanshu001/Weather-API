@@ -1,6 +1,6 @@
 package com.WeatherAPI.service;
 
-import com.WeatherAPI.dao.LocationRepo;
+import com.WeatherAPI.dao.LocationRepository;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.CodeConflictException;
 import com.WeatherAPI.exception.LocationNotFoundException;
@@ -14,34 +14,36 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class LocationService {
-    private final LocationRepo locationRepo;
+    private final LocationRepository locationRepository;
 
     public Location addLocation(Location location) throws CodeConflictException {
         // Checking uniqueness of code
         String code = location.getCode();
-        Location byCode = locationRepo.findByCode(code);
+        Location byCode = locationRepository
+                .findByCode(code).orElse(null);
+
         if(byCode != null){
             throw new CodeConflictException("This code is already used for other city");
         }
-        return locationRepo.save(location);
+        return locationRepository.save(location);
     }
 
     public List<Location> list(){
-        return locationRepo.findUntrashed();
+        return locationRepository.findUntrashed();
     }
 
     public Location get(String code){
-        return locationRepo.findByCode(code);
+        return locationRepository
+                .findByCode(code)
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
     }
 
     public Location update(Location locationInRequest) throws LocationNotFoundException {
         String code = locationInRequest.getCode();
 
-        Location locationInDB = locationRepo.findByCode(code);
-
-        if(locationInDB == null){
-            throw new LocationNotFoundException("No Location found with the given code : " + code);
-        }
+        Location locationInDB = locationRepository
+                .findByCode(code)
+                .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
 
         locationInDB.setCityName(locationInRequest.getCityName());
         locationInDB.setRegionName(locationInRequest.getRegionName());
@@ -49,14 +51,15 @@ public class LocationService {
         locationInDB.setCountryCode(locationInRequest.getCountryCode());
         locationInDB.setEnabled(locationInRequest.isEnabled());
 
-        return locationRepo.save(locationInDB);
+        return locationRepository.save(locationInDB);
 
     }
 
     public void delete(String code) throws LocationNotFoundException {
-        if(!locationRepo.existsById(code)){
+        if(!locationRepository.existsById(code)){
             throw new LocationNotFoundException("No Location found with the given code :" + code);
         }
-        locationRepo.trashedByCode(code);
+
+        locationRepository.trashedByCode(code);
     }
 }
