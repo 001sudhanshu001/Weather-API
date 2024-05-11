@@ -54,32 +54,21 @@ public class LocationApiController {
     public ResponseEntity<?> getByCode(@PathVariable("code") String code){
         Location location = service.get(code);
 
-        if(location == null){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(location);
+        return ResponseEntity.ok(modelMapper.map(location, LocationDto.class));
     }
 
     @PutMapping
     public ResponseEntity<?> updateByCode(@RequestBody @Valid LocationDto locationDto){
-        try {
-            Location location = modelMapper.map(locationDto, Location.class);
-            Location updatedLocation = service.update(location);
+        Location location = modelMapper.map(locationDto, Location.class);
+        Location updatedLocation = service.update(location);
 
-            return ResponseEntity.ok(modelMapper.map(updatedLocation, LocationDto.class));
-        } catch (LocationNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(modelMapper.map(updatedLocation, LocationDto.class));
     }
 
     @DeleteMapping("/{code}")
     public ResponseEntity<?> deleteLocation(@PathVariable("code") String code){
-        try {
-            service.delete(code);
-            return ResponseEntity.noContent().build();
-        } catch (LocationNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        service.delete(code);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.dto.RealTimeWeatherDto;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
 import com.WeatherAPI.exception.GeoLocationException;
@@ -88,6 +89,7 @@ public class RealtimeWeatherApiControllerTests {
                 .andDo(print());
     }
 
+    // TODO : Update Test to use RealTimeWeatherDTO
     @Test // Just to test Request body so no need to use mockito
     public void testUpdateShouldReturn400BadRequest() throws Exception {
         String locationCode = "MUB";
@@ -95,7 +97,7 @@ public class RealtimeWeatherApiControllerTests {
 
         RealTimeWeather realTimeWeather = new RealTimeWeather();
 
-        realTimeWeather.setTemperature(120);
+        realTimeWeather.setTemperature(10); // invalid data
         realTimeWeather.setHumidity(65);
         realTimeWeather.setPrecipitation(95);
         realTimeWeather.setStatus("Windy");
@@ -105,10 +107,11 @@ public class RealtimeWeatherApiControllerTests {
         String bodyContent = mapper.writeValueAsString(realTimeWeather);
 
         System.out.println(bodyContent);
-//        mockMvc.perform(put(END_POINT_END).contentType("application/json").content(bodyContent))
-//                .andExpect(status().isBadRequest())
-//                .andDo(print());
+        mockMvc.perform(put(reqestURI).contentType("application/json").content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
     }
+
 
     @Test // Just to test validation of Request body so no need to use mockito
     public void testUpdateShouldReturn200OK() throws Exception {

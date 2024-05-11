@@ -23,8 +23,6 @@ import java.util.List;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-//    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
@@ -59,7 +57,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(LocationNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ErrorDTO handleLocationNotFoundExceptionException(HttpServletRequest request, Exception ex){
+    public ErrorDTO handleLocationNotFoundException(HttpServletRequest request, Exception ex){
         ErrorDTO errorDTO = new ErrorDTO();
 
         errorDTO.setTimestamp(new Date());

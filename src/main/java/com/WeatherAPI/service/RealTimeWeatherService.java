@@ -23,7 +23,7 @@ public class RealTimeWeatherService {
 
         return realTimeWeatherRepo
                 .findByCountryCodeAndCity(countryCode, cityName)
-                .orElseThrow(() ->  new LocationNotFoundException("No Location found with the given country code and city name"));
+                .orElseThrow(() ->  new LocationNotFoundException(countryCode, cityName));
     }
 
     public RealTimeWeather getByLocationCode(String locationCode) throws LocationNotFoundException {
