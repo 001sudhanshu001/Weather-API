@@ -19,7 +19,7 @@ public class WeatherApiApplication {
 //		ModelMapper modelMapper = new ModelMapper();
 //		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 //
-//		// because we are using embadded object so to map hourOfDay of embadded object to the DTO :
+//		// because we are using embedded object so to map hourOfDay of embedded object to the DTO :
 //		var typeMap1 = modelMapper.typeMap(HourlyWeather.class, HourlyWeatherDto.class);
 //		typeMap1.addMapping(src-> src.getId().getHourOfDay(), HourlyWeatherDto::setHourOfDay);
 //

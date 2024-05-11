@@ -1,6 +1,7 @@
 package com.WeatherAPI.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @JsonPropertyOrder({"code", "city_name", "region_name", "country_code", "country_name", "enabled"})
 public class LocationDto {
+
     @NotNull(message = "Location Code cannot be null")
     @Length(min = 3, max = 12, message = "Location code must have 3 to 12 characters")
     private String code;
@@ -28,6 +30,7 @@ public class LocationDto {
 
     @NotNull(message = "Region name can't be null")
     @Length(min = 3, max = 128, message = "Region name must have 3 to 128 characters")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("region_name")
     private String regionName;
 
