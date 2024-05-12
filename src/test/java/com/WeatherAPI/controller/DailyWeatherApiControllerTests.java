@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DailyWeatherApiControllerTests {
 
     private static final String END_POINT_PATH = "/v1/daily";
-    private static final String RESPONSE_CONTENT_TYPE = "application/hal+json";
     private static final String REQUEST_CONTENT_TYPE = "application/json";
 
     @Autowired
@@ -118,6 +117,74 @@ public class DailyWeatherApiControllerTests {
         mockMvc.perform(get(END_POINT_PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+    }
+
+
+    @Test
+    public void testGetByCodeShouldReturn404NotFound() throws Exception {
+        String locationCode = "MUB";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        LocationNotFoundException ex = new LocationNotFoundException(locationCode);
+        when(dailyWeatherService.getByLocationCode(locationCode)).thenThrow(ex);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errors[0]", is(ex.getMessage())))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByCodeShouldReturn204NoContent() throws Exception {
+        String locationCode = "MUB";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        when(dailyWeatherService.getByLocationCode(locationCode)).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByCodeShouldReturn200OK() throws Exception {
+        String locationCode = "MUB";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        Location location = new Location();
+        location.setCode(locationCode);
+        location.setCityName("New York City");
+        location.setRegionName("New York");
+        location.setCountryCode("US");
+        location.setCountryName("United States of America");
+
+        DailyWeather forecast1 = new DailyWeather()
+                .location(location)
+                .dayOfMonth(16)
+                .month(7)
+                .minTemp(23)
+                .maxTemp(32)
+                .precipitation(40)
+                .status("Cloudy");
+
+        DailyWeather forecast2 = new DailyWeather()
+                .location(location)
+                .dayOfMonth(17)
+                .month(7)
+                .minTemp(25)
+                .maxTemp(34)
+                .precipitation(30)
+                .status("Rainy");
+
+        when(dailyWeatherService.getByLocationCode(locationCode)).thenReturn(List.of(forecast1, forecast2));
+
+        String expectedLocation = location.toString();
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.location", is(expectedLocation)))
                 .andDo(print());
     }
 }
