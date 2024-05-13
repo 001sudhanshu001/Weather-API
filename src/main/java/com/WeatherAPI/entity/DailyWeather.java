@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "weather_daily")
@@ -21,6 +22,36 @@ public class DailyWeather {
 
     @Column(length = 50)
     private String status;
+
+    public DailyWeather getShallowCopy() {
+        DailyWeather copy = new DailyWeather();
+        copy.setId(this.getId());
+
+        return copy;
+    }
+
+    @Override
+    public String toString() {
+        return "DailyWeather [id=" + id + ", minTemp=" + minTemp + ", maxTemp=" + maxTemp + ", precipitation="
+                + precipitation + ", status=" + status + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DailyWeather other = (DailyWeather) obj;
+        return Objects.equals(id, other.id);
+    }
 
     // Builder
     public DailyWeather precipitation(int precipitation){

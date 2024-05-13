@@ -8,6 +8,7 @@ import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,5 +35,31 @@ public class DailyWeatherService {
                 .orElseThrow(() -> new LocationNotFoundException(locationCode));
 
         return dailyWeatherRepository.findByLocationCode(locationCode);
+    }
+
+    public List<DailyWeather> updateByLocationCode(String code, List<DailyWeather> dailyWeatherInRequest)
+            throws LocationNotFoundException {
+        Location location = locationRepository
+                .findByCode(code)
+                .orElseThrow(() -> new LocationNotFoundException(code));
+
+        for (DailyWeather data : dailyWeatherInRequest) {
+            data.getId().setLocation(location);
+        }
+
+        List<DailyWeather> dailyWeatherInDB = location.getDailyWeather();
+        List<DailyWeather> dailyWeatherToBeRemoved = new ArrayList<>();
+
+        for (DailyWeather forecast : dailyWeatherInDB) {
+            if (!dailyWeatherInRequest.contains(forecast)) {
+                dailyWeatherToBeRemoved.add(forecast.getShallowCopy());
+            }
+        }
+
+        for (DailyWeather forecastToBeRemoved : dailyWeatherToBeRemoved) {
+            dailyWeatherInDB.remove(forecastToBeRemoved);
+        }
+
+        return dailyWeatherRepository.saveAll(dailyWeatherInRequest);
     }
 }

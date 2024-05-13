@@ -4,6 +4,7 @@ import com.WeatherAPI.dto.DailyWeatherDTO;
 import com.WeatherAPI.dto.DailyWeatherListDTO;
 import com.WeatherAPI.entity.DailyWeather;
 import com.WeatherAPI.entity.Location;
+import com.WeatherAPI.exception.BadRequestException;
 import com.WeatherAPI.service.DailyWeatherService;
 import com.WeatherAPI.service.GeoLocationService;
 import com.WeatherAPI.utils.CommonUtility;
@@ -11,12 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -59,6 +59,22 @@ public class DailyWeatherApiController {
         return ResponseEntity.ok(dto);
     }
 
+    @PutMapping("/{locationCode}")
+    public ResponseEntity<?> updateDailyForecast(@PathVariable("locationCode") String code,
+                                                 @RequestBody @Valid List<DailyWeatherDTO> listDTO) throws BadRequestException {
+
+        if (listDTO.isEmpty()) {
+            throw new BadRequestException("Daily forecast data cannot be empty");
+        }
+        List<DailyWeather> dailyWeather = listDTO2ListEntity(listDTO);
+
+        List<DailyWeather> updatedForecast = dailyWeatherService.updateByLocationCode(code, dailyWeather);
+
+        DailyWeatherListDTO updatedDto = listEntity2DTO(updatedForecast);
+
+        return ResponseEntity.ok(updatedDto);
+    }
+
 
     private DailyWeatherListDTO listEntity2DTO(List<DailyWeather> dailyForecast) {
         Location location = dailyForecast.get(0).getId().getLocation();
@@ -71,5 +87,15 @@ public class DailyWeatherApiController {
         });
 
         return listDTO;
+    }
+
+    private List<DailyWeather> listDTO2ListEntity(List<DailyWeatherDTO> listDTO) {
+        List<DailyWeather> listEntity = new ArrayList<>();
+
+        listDTO.forEach(dto -> {
+            listEntity.add(modelMapper.map(dto, DailyWeather.class));
+        });
+
+        return listEntity;
     }
 }
