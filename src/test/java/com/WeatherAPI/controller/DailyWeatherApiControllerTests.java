@@ -1,5 +1,6 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.dto.DailyWeatherDTO;
 import com.WeatherAPI.entity.DailyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.GeoLocationException;
@@ -16,12 +17,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -186,5 +190,77 @@ public class DailyWeatherApiControllerTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.location", is(expectedLocation)))
                 .andDo(print());
+    }
+
+
+    @Test
+    public void testUpdateShouldReturn400BadRequestBecauseNoData() throws Exception {
+        String requestURI = END_POINT_PATH + "/NYC_USA";
+
+        List<DailyWeatherDTO> listDTO = Collections.emptyList();
+
+        String requestBody = objectMapper.writeValueAsString(listDTO);
+
+        mockMvc.perform(put(requestURI).contentType(REQUEST_CONTENT_TYPE).content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Daily forecast data cannot be empty")))
+                .andDo(print());
+    }
+
+    @Test
+    public void testUpdateShouldReturn400BadRequestBecauseInvalidData() throws Exception {
+        String requestURI = END_POINT_PATH + "/NYC_USA";
+
+        DailyWeatherDTO dto1 = new DailyWeatherDTO()
+                .dayOfMonth(40)
+                .month(7)
+                .minTemp(23)
+                .maxTemp(30)
+                .precipitation(20)
+                .status("Clear");
+
+        DailyWeatherDTO dto2 = new DailyWeatherDTO()
+                .dayOfMonth(20)
+                .month(7)
+                .minTemp(23)
+                .maxTemp(30)
+                .precipitation(20)
+                .status("Clear");
+
+        List<DailyWeatherDTO> listDTO = List.of(dto1, dto2);
+
+        String requestBody = objectMapper.writeValueAsString(listDTO);
+
+        mockMvc.perform(put(requestURI).contentType(REQUEST_CONTENT_TYPE).content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", containsString("Day of month must be between 1-31")))
+                .andDo(print());
+
+    }
+
+    @Test
+    public void testUpdateShouldReturn404NotFound() throws Exception {
+        String locationCode = "NYC_USA";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        DailyWeatherDTO dto = new DailyWeatherDTO()
+                .dayOfMonth(21)
+                .month(7)
+                .minTemp(23)
+                .maxTemp(30)
+                .precipitation(20)
+                .status("Clear");
+
+        List<DailyWeatherDTO> listDTO = List.of(dto);
+
+        String requestBody = objectMapper.writeValueAsString(listDTO);
+
+        LocationNotFoundException ex = new LocationNotFoundException(locationCode);
+        when(dailyWeatherService.updateByLocationCode(Mockito.eq(locationCode), Mockito.anyList())).thenThrow(ex);
+
+        mockMvc.perform(put(requestURI).contentType(REQUEST_CONTENT_TYPE).content(requestBody))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+
     }
 }

@@ -23,6 +23,7 @@ public class DailyWeather {
     @Column(length = 50)
     private String status;
 
+    // getShallowCopy and equals method are used to check the equality of object while updating DailyWeather
     public DailyWeather getShallowCopy() {
         DailyWeather copy = new DailyWeather();
         copy.setId(this.getId());
