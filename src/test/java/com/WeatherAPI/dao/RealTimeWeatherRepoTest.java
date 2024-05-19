@@ -24,7 +24,7 @@ public class RealTimeWeatherRepoTest {
         String code = "MUB";
         RealTimeWeather realTimeWeather = repo.findById(code).get();
 
-        realTimeWeather.setTemperature(30);
+        realTimeWeather.setTemperature(35);
         realTimeWeather.setHumidity(65);
         realTimeWeather.setPrecipitation(95);
         realTimeWeather.setStatus("Windy");

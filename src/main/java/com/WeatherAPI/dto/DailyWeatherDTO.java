@@ -1,5 +1,6 @@
 package com.WeatherAPI.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,15 +16,18 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class DailyWeatherDTO {
 
     @Range(min = 1, max = 31, message = "Day of month must be between 1-31")
+    @JsonProperty("day_of_month")
     private int dayOfMonth;
 
     @Range(min = 1, max = 12, message = "Month must be between 1-12")
     private int month;
 
     @Range(min = -50, max = 50, message = "Minimum temperature must be in the range of -50 to 50 Celsius degree")
+    @JsonProperty("min_temp")
     private int minTemp;
 
     @Range(min = -50, max = 50, message = "Maximum temperature must be in the range of -50 to 50 Celsius degree")
+    @JsonProperty("max_temp")
     private int maxTemp;
 
     @Range(min = 0, max = 100, message = "Precipitation must be in the range of 0 to 100 percentage")

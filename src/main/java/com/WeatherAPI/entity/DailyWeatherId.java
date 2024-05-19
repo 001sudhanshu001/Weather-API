@@ -1,20 +1,12 @@
 package com.WeatherAPI.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import javax.persistence.Access;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter @Setter
 public class DailyWeatherId implements Serializable {
 
     private int dayOfMonth;
@@ -23,5 +15,60 @@ public class DailyWeatherId implements Serializable {
     @ManyToOne
     @JoinColumn(name =  "location_code")
     private Location location;
+
+    public DailyWeatherId() { }
+
+    public DailyWeatherId(int dayOfMonth, int month, Location location) {
+        super();
+        this.dayOfMonth = dayOfMonth;
+        this.month = month;
+        this.location = location;
+    }
+
+    public int getDayOfMonth() {
+        return dayOfMonth;
+    }
+
+    public void setDayOfMonth(int dayOfMonth) {
+        this.dayOfMonth = dayOfMonth;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return "DailyWeatherId [dayOfMonth=" + dayOfMonth + ", month=" + month + ", location=" + location + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dayOfMonth, location, month);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DailyWeatherId other = (DailyWeatherId) obj;
+        return dayOfMonth == other.dayOfMonth && Objects.equals(location, other.location) && month == other.month;
+    }
 
 }

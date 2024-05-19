@@ -66,6 +66,8 @@ public class DailyWeatherApiController {
         if (listDTO.isEmpty()) {
             throw new BadRequestException("Daily forecast data cannot be empty");
         }
+
+        listDTO.forEach(System.out::println);
         List<DailyWeather> dailyWeather = listDTO2ListEntity(listDTO);
 
         List<DailyWeather> updatedForecast = dailyWeatherService.updateByLocationCode(code, dailyWeather);

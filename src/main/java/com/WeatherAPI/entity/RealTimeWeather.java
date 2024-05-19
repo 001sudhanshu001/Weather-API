@@ -1,15 +1,9 @@
 package com.WeatherAPI.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 
@@ -39,7 +33,7 @@ public class RealTimeWeather {
     @MapsId  // To make same id as Location
     private Location location;
 
-    public void setLocation(Location location){
+    public void setLocation(Location location) {
         this.locationCode = location.getCode();
         this.location = location;
     }

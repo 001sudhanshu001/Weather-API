@@ -50,7 +50,7 @@ public class   Location {
     @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL, orphanRemoval = true) // One Location will have weather info for more than one hour
     private List<HourlyWeather> hourlyWeatherList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<DailyWeather> dailyWeather = new ArrayList<>();
 
     public Location(String cityName, String regionName, String countryName, String countryCode) {

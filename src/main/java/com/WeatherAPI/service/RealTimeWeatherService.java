@@ -8,7 +8,9 @@ import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class RealTimeWeatherService {
                 .orElseThrow(() -> new LocationNotFoundException("No Location found with the given code:" + locationCode));
     }
 
-    public RealTimeWeather update(String locationCode, RealTimeWeather weather) throws LocationNotFoundException {
+    public RealTimeWeather update(String locationCode, RealTimeWeather weather) {
         Location location = locationRepository
                 .findByCode(locationCode)
                 .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
@@ -41,8 +43,9 @@ public class RealTimeWeatherService {
         // Because in RealTimeWeather we are using JsonIgnore for lastUpdated and location
         weather.setLocation(location);
         weather.setLastUpdated(new Date());
+
         // This is for those location which does not have realtime Weather data into database, they are just in Location Table
-        if (location.getRealTimeWeather() == null) { //
+        if (location.getRealTimeWeather() == null) {
             location.setRealTimeWeather(weather);
             Location updatedLocation = locationRepository.save(location);
             // Here no need to save the weather explicitly because of CASCADE.ALL

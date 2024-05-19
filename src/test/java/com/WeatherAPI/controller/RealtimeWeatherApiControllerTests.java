@@ -17,8 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Date;
 
-import static net.bytebuddy.matcher.ElementMatchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -90,14 +91,14 @@ public class RealtimeWeatherApiControllerTests {
     }
 
     // TODO : Update Test to use RealTimeWeatherDTO
-    @Test // Just to test Request body so no need to use mockito
+    @Test // Just to test Request body so no need to use mockito for updateService
     public void testUpdateShouldReturn400BadRequest() throws Exception {
         String locationCode = "MUB";
-        String reqestURI = END_POINT_PATH + "/" + locationCode;
+        String requestURI = END_POINT_PATH + "/" + locationCode;
 
-        RealTimeWeather realTimeWeather = new RealTimeWeather();
+        RealTimeWeatherDto realTimeWeather = new RealTimeWeatherDto();
 
-        realTimeWeather.setTemperature(10); // invalid data
+        realTimeWeather.setTemperature(100); // invalid data
         realTimeWeather.setHumidity(65);
         realTimeWeather.setPrecipitation(95);
         realTimeWeather.setStatus("Windy");
@@ -107,13 +108,13 @@ public class RealtimeWeatherApiControllerTests {
         String bodyContent = mapper.writeValueAsString(realTimeWeather);
 
         System.out.println(bodyContent);
-        mockMvc.perform(put(reqestURI).contentType("application/json").content(bodyContent))
+        mockMvc.perform(put(requestURI).contentType("application/json").content(bodyContent))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
 
-    @Test // Just to test validation of Request body so no need to use mockito
+    @Test
     public void testUpdateShouldReturn200OK() throws Exception {
         String locationCode = "MUB";
         String reqestURI = END_POINT_PATH + "/" + locationCode;
@@ -138,11 +139,22 @@ public class RealtimeWeatherApiControllerTests {
 
         location.setRealTimeWeather(realTimeWeather);
 
+
+        RealTimeWeatherDto dto = new RealTimeWeatherDto();
+
+        dto.setTemperature(20);
+        dto.setHumidity(65);
+        dto.setPrecipitation(95);
+        dto.setStatus("Windy");
+        dto.setWindSpeed(40);
+        dto.setLastUpdated(new Date());
+
         Mockito.when(realTimeWeatherService.update(locationCode, realTimeWeather)).thenReturn(realTimeWeather);
-        String bodyContent = mapper.writeValueAsString(realTimeWeather);
+
+        String bodyContent = mapper.writeValueAsString(dto);
 
         System.out.println(bodyContent);
-        mockMvc.perform(put(END_POINT_PATH).contentType("application/json").content(bodyContent))
+        mockMvc.perform(put(reqestURI).contentType("application/json").content(bodyContent))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -158,7 +170,7 @@ public class RealtimeWeatherApiControllerTests {
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.errors[0]", is(ex.getMessage())))
+                .andExpect(jsonPath("$.errors[0]", is(ex.getMessage())))
                 .andDo(print());
     }
 

@@ -66,10 +66,21 @@ public class RealTimeWeatherController {
     // TODO :- Refactor code to use RealTimeWeatherDTO
     @PutMapping("/{locationCode}")
     public ResponseEntity<?> updateRealTimeWeatherByLocationCode(@PathVariable("locationCode") String locationCode,
-                                                                 @RequestBody @Valid RealTimeWeather realTimeWeatherInRequest) {
+                                                                 @RequestBody @Valid RealTimeWeatherDto dtoInRequest) {
         try {
-            RealTimeWeather updatedRealTimeWeather = realTimeWeatherService.update(locationCode, realTimeWeatherInRequest);
+            System.out.println(dtoInRequest);
+            RealTimeWeather realTimeWeather = modelMapper.map(dtoInRequest, RealTimeWeather.class);
+            realTimeWeather.setLocationCode(locationCode);
+
+            System.out.println("REACHED 1");
+            System.out.println("1.1");
+            System.out.println(realTimeWeather);
+
+            RealTimeWeather updatedRealTimeWeather = realTimeWeatherService.update(locationCode, realTimeWeather);
+            System.out.println("REACHED 2");
+
             RealTimeWeatherDto weatherDto = modelMapper.map(updatedRealTimeWeather, RealTimeWeatherDto.class);
+            System.out.println("REACHED 3");
 
             return ResponseEntity.ok(weatherDto);
         } catch (LocationNotFoundException e) {
