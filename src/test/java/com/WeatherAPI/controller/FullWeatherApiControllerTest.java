@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FullWeatherApiControllerTest {
     private static final String END_POINT_PATH = "/v1/full";
     private static final String REQUEST_CONTENT_TYPE = "application/json";
+    private static final String RESPONSE_CONTENT_TYPE = "application/json";
 
     @Autowired
     private MockMvc mockMvc;
@@ -138,4 +139,92 @@ public class FullWeatherApiControllerTest {
                 .andExpect(jsonPath("$.daily_forecast[0].precipitation", is(40)))
                 .andDo(print());
     }
+
+    @Test
+    public void testGetByCodeShouldReturn404NotFound() throws Exception {
+        String locationCode = "ABC123";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        LocationNotFoundException ex = new LocationNotFoundException(locationCode);
+        when(fullWeatherService.getLocationByCode(locationCode)).thenThrow(ex);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errors[0]", is(ex.getMessage())))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByCodeShouldReturn200OK() throws Exception {
+        String locationCode = "MUB";
+        String requestURI = END_POINT_PATH + "/" + locationCode;
+
+        Location location = new Location();
+        location.setCode(locationCode);
+        location.setCityName("Mumbai");
+        location.setRegionName("India");
+        location.setCountryCode("IN");
+        location.setCountryName("India");
+
+        RealTimeWeather realtimeWeather = new RealTimeWeather();
+        realtimeWeather.setTemperature(12);
+        realtimeWeather.setHumidity(32);
+        realtimeWeather.setLastUpdated(new Date());
+        realtimeWeather.setPrecipitation(88);
+        realtimeWeather.setStatus("Cloudy");
+        realtimeWeather.setWindSpeed(5);
+
+        location.setRealTimeWeather(realtimeWeather);
+
+        DailyWeather dailyForecast1 = new DailyWeather()
+                .location(location)
+                .dayOfMonth(16)
+                .month(7)
+                .minTemp(23)
+                .maxTemp(32)
+                .precipitation(40)
+                .status("Cloudy");
+
+        DailyWeather dailyForecast2 = new DailyWeather()
+                .location(location)
+                .dayOfMonth(17)
+                .month(7)
+                .minTemp(25)
+                .maxTemp(34)
+                .precipitation(30)
+                .status("Sunny");
+
+        location.setDailyWeather(List.of(dailyForecast1, dailyForecast2));
+
+        HourlyWeather hourlyForecast1 = new HourlyWeather()
+                .location(location)
+                .hourOfDay(10)
+                .temperature(13)
+                .precipitation(70)
+                .status("Cloudy");
+
+        HourlyWeather hourlyForecast2 = new HourlyWeather()
+                .location(location)
+                .hourOfDay(11)
+                .temperature(15)
+                .precipitation(60)
+                .status("Sunny");
+
+        location.setHourlyWeatherList(List.of(hourlyForecast1, hourlyForecast2));
+
+        when(fullWeatherService.getLocationByCode(locationCode)).thenReturn(location);
+
+        String expectedLocation = location.toString();
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RESPONSE_CONTENT_TYPE))
+                .andExpect(jsonPath("$.location", is(expectedLocation)))
+                .andExpect(jsonPath("$.realtime_weather.temperature", is(12)))
+                .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(10)))
+                .andExpect(jsonPath("$.daily_forecast[0].precipitation", is(40)))
+                .andDo(print());
+    }
+
+
 }

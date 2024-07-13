@@ -19,4 +19,10 @@ public class FullWeatherService {
                 .orElseThrow(() -> new LocationNotFoundException(countryCode, cityName));
 
     }
+
+    public Location getLocationByCode(String locationCode) {
+        return locationRepository.findByCode(locationCode)
+                .orElseThrow(() -> new LocationNotFoundException(locationCode));
+
+    }
 }

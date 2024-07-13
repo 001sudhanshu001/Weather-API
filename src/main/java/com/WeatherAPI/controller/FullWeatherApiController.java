@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,6 +45,14 @@ public class FullWeatherApiController {
 
     private Location dto2Entity(FullWeatherDTO dto) {
         return modelMapper.map(dto, Location.class);
+    }
+
+    @GetMapping("/{locationCode}")
+    public ResponseEntity<?> getFullWeatherByLocationCode(@PathVariable String locationCode) {
+
+        Location locationInDB = fullWeatherService.getLocationByCode(locationCode);
+
+        return ResponseEntity.ok(entity2DTO(locationInDB));
     }
 
 }
