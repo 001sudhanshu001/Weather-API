@@ -2,18 +2,17 @@ package com.WeatherAPI.controller;
 
 import com.WeatherAPI.dto.FullWeatherDTO;
 import com.WeatherAPI.entity.Location;
+import com.WeatherAPI.exception.BadRequestException;
 import com.WeatherAPI.service.FullWeatherService;
 import com.WeatherAPI.service.GeoLocationService;
 import com.WeatherAPI.utils.CommonUtility;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/v1/full")
@@ -35,6 +34,35 @@ public class FullWeatherApiController {
         return ResponseEntity.ok(entity2DTO(locationInDB));
     }
 
+    @GetMapping("/{locationCode}")
+    public ResponseEntity<?> getFullWeatherByLocationCode(@PathVariable String locationCode) {
+
+        Location locationInDB = fullWeatherService.getLocationByCode(locationCode);
+
+        return ResponseEntity.ok(entity2DTO(locationInDB));
+    }
+
+    @PutMapping("/{locationCode}")
+    public ResponseEntity<?> updateFullWeather(@PathVariable String locationCode,
+                                               @RequestBody @Valid FullWeatherDTO dto)  {
+
+        if (dto.getHourlyWeatherList().isEmpty()) {
+            throw new BadRequestException("Hourly weather data cannot be empty");
+        }
+
+        if (dto.getDailyWeather().isEmpty()) {
+            throw new BadRequestException("Daily weather data cannot be empty");
+        }
+
+        Location locationInRequest = dto2Entity(dto);
+
+        Location updatedLocation = fullWeatherService.update(locationCode, locationInRequest);
+
+        return ResponseEntity.ok(entity2DTO(updatedLocation));
+    }
+
+
+    
     private FullWeatherDTO entity2DTO(Location entity) {
         FullWeatherDTO dto = modelMapper.map(entity, FullWeatherDTO.class);
 
@@ -45,14 +73,6 @@ public class FullWeatherApiController {
 
     private Location dto2Entity(FullWeatherDTO dto) {
         return modelMapper.map(dto, Location.class);
-    }
-
-    @GetMapping("/{locationCode}")
-    public ResponseEntity<?> getFullWeatherByLocationCode(@PathVariable String locationCode) {
-
-        Location locationInDB = fullWeatherService.getLocationByCode(locationCode);
-
-        return ResponseEntity.ok(entity2DTO(locationInDB));
     }
 
 }
