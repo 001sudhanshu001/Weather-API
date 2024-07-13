@@ -1,5 +1,6 @@
 package com.WeatherAPI.dto;
 
+import com.WeatherAPI.filter.RealTimeWeatherFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -15,6 +16,7 @@ public class FullWeatherDTO {
 
     // make sure the variable name are same as in Location.class
     @JsonProperty("realtime_weather")
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RealTimeWeatherFilter.class)
     private RealTimeWeatherDto realTimeWeather = new RealTimeWeatherDto();
 
     @JsonProperty("hourly_forecast")

@@ -19,7 +19,6 @@ public class GeoLocationService {
     private static final IP2Location ipLocator = new IP2Location();
 
     public GeoLocationService(){
-        System.out.println("Object Created for GeoLocationService");
         try {
             ipLocator.Open(DBPath);
         }catch (IOException ex){
@@ -30,7 +29,9 @@ public class GeoLocationService {
     public Location getLocationFromIpAddress(String ipAddress) throws GeoLocationException {
         try {
             IPResult result = ipLocator.IPQuery(ipAddress);
+            
             LOGGER.info(result.toString());
+
             if(!result.getStatus().equals("OK")){
                 throw new GeoLocationException("GeoLocation failed with status " + result.getStatus());
             }

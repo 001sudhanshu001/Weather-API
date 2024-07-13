@@ -28,6 +28,7 @@ public class FullWeatherApiController {
         String ipAddress = CommonUtility.getIpAddress(request);
 
         Location locationFromIP = geoLocationService.getLocationFromIpAddress(ipAddress);
+        System.out.println("Location from IP is " + locationFromIP);
         Location locationInDB = fullWeatherService.getLocation(locationFromIP);
 
         return ResponseEntity.ok(entity2DTO(locationInDB));
