@@ -19,7 +19,7 @@ public class RealTimeWeatherDto {
     // Because they have same name, Since we can't directly map reference to String
     // So we override the toString() method Location
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL) //so this means if the location is non-null then only include it in the JSON
     private String location;
 
     @Range(min = -50, max = 50, message = "Temperature must be in the range of -50 to 50 Celsius degree")

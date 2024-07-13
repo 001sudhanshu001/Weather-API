@@ -1,9 +1,11 @@
 package com.WeatherAPI;
 
 import com.WeatherAPI.dto.DailyWeatherDTO;
+import com.WeatherAPI.dto.FullWeatherDTO;
 import com.WeatherAPI.dto.HourlyWeatherDto;
 import com.WeatherAPI.entity.DailyWeather;
 import com.WeatherAPI.entity.HourlyWeather;
+import com.WeatherAPI.entity.Location;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -55,6 +57,10 @@ public class WeatherApiApplication {
 
 		typeMap4.addMapping(src -> src.getMonth(),
 						(dest, value) -> dest.getId().setMonth(value != null ? (int) value : 0));
+
+		var typeMap5 = mapper.typeMap(Location.class, FullWeatherDTO.class);
+		typeMap5.addMapping(src -> src.toString(), FullWeatherDTO::setLocation);
+
 		return mapper;
 	}
 

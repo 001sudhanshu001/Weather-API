@@ -139,9 +139,7 @@ public class RealtimeWeatherApiControllerTests {
 
         location.setRealTimeWeather(realTimeWeather);
 
-
         RealTimeWeatherDto dto = new RealTimeWeatherDto();
-
         dto.setTemperature(20);
         dto.setHumidity(65);
         dto.setPrecipitation(95);
@@ -195,7 +193,6 @@ public class RealtimeWeatherApiControllerTests {
 
         realtimeWeather.setLocation(location);
         location.setRealTimeWeather(realtimeWeather);
-
 
         Mockito.when(realTimeWeatherService.getByLocationCode(locationCode)).thenReturn(realtimeWeather);
 

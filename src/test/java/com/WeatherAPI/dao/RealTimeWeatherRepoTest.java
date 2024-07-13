@@ -25,7 +25,7 @@ public class RealTimeWeatherRepoTest {
         RealTimeWeather realTimeWeather = repo.findById(code).get();
 
         realTimeWeather.setTemperature(35);
-        realTimeWeather.setHumidity(65);
+        realTimeWeather.setHumidity(52);
         realTimeWeather.setPrecipitation(95);
         realTimeWeather.setStatus("Windy");
         realTimeWeather.setWindSpeed(40);
@@ -33,7 +33,7 @@ public class RealTimeWeatherRepoTest {
 
         RealTimeWeather updatedRealTime = repo.save(realTimeWeather);
 
-        assertThat(updatedRealTime.getHumidity()).isEqualTo(65);
+        assertThat(updatedRealTime.getHumidity()).isEqualTo(52);
 
     }
 
