@@ -27,22 +27,6 @@ public class WeatherApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WeatherApiApplication.class, args);
 	}
-//	@Bean
-//	public ModelMapper modelMapper(){
-//		ModelMapper modelMapper = new ModelMapper();
-//		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-//
-//		// because we are using embedded object so to map hourOfDay of embedded object to the DTO :
-//		var typeMap1 = modelMapper.typeMap(HourlyWeather.class, HourlyWeatherDto.class);
-//		typeMap1.addMapping(src-> src.getId().getHourOfDay(), HourlyWeatherDto::setHourOfDay);
-//
-//		//
-//		var typeMap2 = modelMapper.typeMap(HourlyWeatherDto.class, HourlyWeather.class);
-//		typeMap2.addMapping(src-> src.getHourOfDay(),
-//				(dest,value) -> dest.getId().setHourOfDay(value != null ? (int)value : 0));
-//
-//		return modelMapper;
-//	}
 
 	@Bean
 	public ModelMapper getModelMapper() {

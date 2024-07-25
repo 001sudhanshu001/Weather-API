@@ -8,12 +8,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Getter @Setter
-public class RealTimeWeatherDto implements Serializable {
+public class RealTimeWeatherDto extends RepresentationModel<RealTimeWeatherDto>
+                                implements Serializable{
 
     // ModelMapper map Location(reference) of RealTimeWeather to this location(String)
     // Because they have same name, Since we can't directly map reference to String

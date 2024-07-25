@@ -28,8 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(RealTimeWeatherController.class)
 public class RealtimeWeatherApiControllerTests {
     private static final  String END_POINT_PATH = "/v1/realtime";
+    private static final String RESPONSE_CONTENT_TYPE = "application/hal+json";
+
     @Autowired
     MockMvc mockMvc;
+
     @Autowired
     ObjectMapper mapper;
 
@@ -38,6 +41,7 @@ public class RealtimeWeatherApiControllerTests {
 
     @MockBean
     RealTimeWeatherService realTimeWeatherService;
+
     @MockBean
     GeoLocationService geoLocationService;
 
@@ -90,12 +94,19 @@ public class RealtimeWeatherApiControllerTests {
         Mockito.when(geoLocationService.getLocationFromIpAddress(Mockito.anyString())).thenReturn(location);
         Mockito.when(realTimeWeatherService.getWeatherByLocation(location)).thenReturn(realTimeWeatherDto);
 
+        String expectedLocation = location.getCityName() + ", " + location.getRegionName() + ", " + location.getCountryName();
+
         mockMvc.perform(get(END_POINT_PATH))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(RESPONSE_CONTENT_TYPE))
+                .andExpect(jsonPath("$.location", is(expectedLocation)))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/v1/realtime")))
+                .andExpect(jsonPath("$._links.hourly_forecast.href", is("http://localhost/v1/hourly")))
+                .andExpect(jsonPath("$._links.daily_forecast.href", is("http://localhost/v1/daily")))
+                .andExpect(jsonPath("$._links.full_forecast.href", is("http://localhost/v1/full")))
                 .andDo(print());
     }
 
-    // TODO : Update Test to use RealTimeWeatherDTO
     @Test // Just to test Request body so no need to use mockito for updateService
     public void testUpdateShouldReturn400BadRequest() throws Exception {
         String locationCode = "MUB";
@@ -122,7 +133,7 @@ public class RealtimeWeatherApiControllerTests {
     @Test
     public void testUpdateShouldReturn200OK() throws Exception {
         String locationCode = "MUB";
-        String reqestURI = END_POINT_PATH + "/" + locationCode;
+        String requestURI = END_POINT_PATH + "/" + locationCode;
 
         Location location = new Location();
         location.setCode(locationCode);
@@ -156,9 +167,16 @@ public class RealtimeWeatherApiControllerTests {
 
         String bodyContent = mapper.writeValueAsString(dto);
 
-        System.out.println(bodyContent);
-        mockMvc.perform(put(reqestURI).contentType("application/json").content(bodyContent))
+        String expectedLocation = location.getCityName() + ", " + location.getRegionName() + ", " + location.getCountryName();
+
+        mockMvc.perform(put(requestURI).contentType("application/json").content(bodyContent))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.location", is(expectedLocation)))
+                .andExpect(content().contentType(RESPONSE_CONTENT_TYPE))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/v1/realtime/" + locationCode)))
+                .andExpect(jsonPath("$._links.hourly_forecast.href", is("http://localhost/v1/hourly/" + locationCode)))
+                .andExpect(jsonPath("$._links.daily_forecast.href", is("http://localhost/v1/daily/" + locationCode)))
+                .andExpect(jsonPath("$._links.full_forecast.href", is("http://localhost/v1/full/" + locationCode)))
                 .andDo(print());
     }
 
@@ -173,7 +191,6 @@ public class RealtimeWeatherApiControllerTests {
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.errors[0]", is(ex.getMessage())))
                 .andDo(print());
     }
 
@@ -208,8 +225,10 @@ public class RealtimeWeatherApiControllerTests {
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-//                .andExpect(jsonPath("$.location", is(expectedLocation)))
+                .andExpect(content().contentType(RESPONSE_CONTENT_TYPE))
+                .andExpect(jsonPath("$.location", is(expectedLocation)))
                 .andDo(print());
     }
+
+
 }

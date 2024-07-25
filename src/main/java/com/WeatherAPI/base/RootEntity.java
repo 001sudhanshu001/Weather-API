@@ -1,10 +1,8 @@
 package com.WeatherAPI.base;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
-
 
 @JsonPropertyOrder({"locations_url", "location_by_code_url", "realtime_weather_by_ip_url",
         "realtime_weather_by_code_url", "hourly_forecast_by_ip_url", "hourly_forecast_by_code_url",
