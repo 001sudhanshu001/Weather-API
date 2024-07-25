@@ -19,11 +19,11 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.CoreMatchers.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.CoreMatchers.is;
 
 @WebMvcTest(LocationApiController.class)
 public class LocationApiControllerTest {
@@ -229,6 +229,59 @@ public class LocationApiControllerTest {
                 .andExpect(jsonPath("$[1].city_name", is("Delhi")))
                 .andDo(print());
     }
+
+    @Test
+    public void testListByPageShouldReturn400BadRequestInvalidPageNum() throws Exception {
+        int pageNum = 0;
+        int pageSize = 5;
+        String sortField = "code";
+
+        Mockito.when(service.listByPage(anyInt(), anyInt(), anyString()))
+                .thenReturn(Page.empty());
+
+        String requestURI = END_POINT_PATH + "?page=" + pageNum + "&size=" + pageSize + "&sort=" + sortField;
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", containsString("must be greater than or equal to 1")))
+                .andDo(print());
+    }
+
+    @Test
+    public void testListByPageShouldReturn400BadRequestInvalidPageSize() throws Exception {
+        int pageNum = 1;
+        int pageSize = 3;
+        String sortField = "code";
+
+        Mockito.when(service.listByPage(anyInt(), anyInt(), anyString()))
+                .thenReturn(Page.empty());
+
+        String requestURI = END_POINT_PATH + "?page=" + pageNum + "&size=" + pageSize + "&sort=" + sortField;
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", containsString("must be greater than or equal to 5")))
+                .andDo(print());
+        // This message is the Default of @Min() from jakarta.validation.constraints.Min.message = must be greater than or equal to {value}
+    }
+
+    @Test
+    public void testListByPageShouldReturn400BadRequestInvalidSortField() throws Exception {
+        int pageNum = 1;
+        int pageSize = 5;
+        String sortField = "code_abc";
+
+        Mockito.when(service.listByPage(anyInt(), anyInt(), anyString()))
+                .thenReturn(Page.empty());
+
+        String requestURI = END_POINT_PATH + "?page=" + pageNum + "&size=" + pageSize + "&sort=" + sortField;
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", containsStringIgnoringCase("invalid sort field")))
+                .andDo(print());
+    }
+
 
 
     @Test
