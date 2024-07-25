@@ -11,8 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/v1/full")
@@ -23,6 +27,7 @@ public class FullWeatherApiController {
     private final FullWeatherService fullWeatherService;
     private final ModelMapper modelMapper;
 
+
     @GetMapping
     @RateLimited
     public ResponseEntity<?> getFullWeatherByIPAddress(HttpServletRequest request) {
@@ -31,7 +36,8 @@ public class FullWeatherApiController {
         Location locationFromIP = geoLocationService.getLocationFromIpAddress(ipAddress);
         Location locationInDB = fullWeatherService.getLocation(locationFromIP);
 
-        return ResponseEntity.ok(entity2DTO(locationInDB));
+        FullWeatherDTO fullWeatherDTO = entity2DTO(locationInDB);
+        return ResponseEntity.ok(addLinksByIp(fullWeatherDTO));
     }
 
     @GetMapping("/{locationCode}")
@@ -40,7 +46,8 @@ public class FullWeatherApiController {
 
         Location locationInDB = fullWeatherService.getLocationByCode(locationCode);
 
-        return ResponseEntity.ok(entity2DTO(locationInDB));
+        FullWeatherDTO fullWeatherDTO = entity2DTO(locationInDB);
+        return ResponseEntity.ok(addLinksByLocation(entity2DTO(locationInDB), locationCode));
     }
 
     @PutMapping("/{locationCode}")
@@ -59,8 +66,8 @@ public class FullWeatherApiController {
         Location locationInRequest = dto2Entity(dto);
 
         Location updatedLocation = fullWeatherService.update(locationCode, locationInRequest);
-
-        return ResponseEntity.ok(entity2DTO(updatedLocation));
+        FullWeatherDTO fullWeatherDTO = entity2DTO(updatedLocation);
+        return ResponseEntity.ok(addLinksByLocation(fullWeatherDTO, locationCode));
     }
 
     
@@ -74,6 +81,20 @@ public class FullWeatherApiController {
 
     private Location dto2Entity(FullWeatherDTO dto) {
         return modelMapper.map(dto, Location.class);
+    }
+
+    private EntityModel<FullWeatherDTO> addLinksByLocation(FullWeatherDTO dto, String locationCode) {
+        return EntityModel.of(dto)
+                .add(linkTo(
+                        methodOn(FullWeatherApiController.class).getFullWeatherByLocationCode(locationCode))
+                        .withSelfRel());
+    }
+
+    private EntityModel<FullWeatherDTO> addLinksByIp(FullWeatherDTO dto) {
+        return EntityModel.of(dto)
+                .add(linkTo(
+                        methodOn(FullWeatherApiController.class).getFullWeatherByIPAddress(null))
+                        .withSelfRel());
     }
 
 }

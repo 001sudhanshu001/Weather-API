@@ -18,7 +18,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Date;
@@ -36,7 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FullWeatherApiControllerTest {
     private static final String END_POINT_PATH = "/v1/full";
     private static final String REQUEST_CONTENT_TYPE = "application/json";
-    private static final String RESPONSE_CONTENT_TYPE = "application/json";
+    private static final String RESPONSE_CONTENT_TYPE = "application/hal+json";
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,6 +60,7 @@ public class FullWeatherApiControllerTest {
                 .andExpect(jsonPath("$.errors[0]", is(ex.getMessage())))
                 .andDo(print());
     }
+
 
     @Test
     public void testGetByIPShouldReturn404NotFound() throws Exception {
@@ -139,11 +140,12 @@ public class FullWeatherApiControllerTest {
 
         mockMvc.perform(get(END_POINT_PATH))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(RESPONSE_CONTENT_TYPE))
                 .andExpect(jsonPath("$.location", is(expectedLocation)))
                 .andExpect(jsonPath("$.realtime_weather.temperature", is(12)))
                 .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(11)))
                 .andExpect(jsonPath("$.daily_forecast[0].precipitation", is(40)))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/v1/full")))
                 .andDo(print());
     }
 
@@ -230,6 +232,7 @@ public class FullWeatherApiControllerTest {
                 .andExpect(jsonPath("$.realtime_weather.temperature", is(12)))
                 .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(10)))
                 .andExpect(jsonPath("$.daily_forecast[0].precipitation", is(40)))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/v1/full/" + locationCode)))
                 .andDo(print());
     }
 
@@ -458,10 +461,10 @@ public class FullWeatherApiControllerTest {
 
         Location location = new Location();
         location.setCode(locationCode);
-        location.setCityName("New York City");
-        location.setRegionName("New York");
-        location.setCountryCode("US");
-        location.setCountryName("United States of America");
+        location.setCityName("Mumbai");
+        location.setRegionName("Maharashtra");
+        location.setCountryCode("IN");
+        location.setCountryName("India");
 
         RealTimeWeather realtimeWeather = new RealTimeWeather();
         realtimeWeather.setTemperature(12);
@@ -534,6 +537,7 @@ public class FullWeatherApiControllerTest {
                 .andExpect(jsonPath("$.realtime_weather.temperature", is(12)))
                 .andExpect(jsonPath("$.hourly_forecast[0].hour_of_day", is(10)))
                 .andExpect(jsonPath("$.daily_forecast[0].precipitation", is(40)))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/v1/full/" + locationCode)))
                 .andDo(print());
     }
 }
