@@ -1,6 +1,5 @@
 package com.WeatherAPI.config;
 
-
 import com.WeatherAPI.constants.CacheConstants;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
