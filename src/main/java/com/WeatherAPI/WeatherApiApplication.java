@@ -8,6 +8,9 @@ import com.WeatherAPI.entity.DailyWeather;
 import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -86,6 +89,16 @@ public class WeatherApiApplication {
 
 				.addMapping(src -> src.getMonth(),
 						(dest, value) -> dest.getId().setMonth(value != null ? (int) value : 0));
+	}
+
+	@Bean
+	public ObjectMapper objectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+
+		return objectMapper;
 	}
 
 
