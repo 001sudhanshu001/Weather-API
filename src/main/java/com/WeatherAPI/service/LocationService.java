@@ -8,6 +8,10 @@ import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,12 +36,21 @@ public class LocationService {
         return locationRepository.save(location);
     }
 
+    @Deprecated
     @Cacheable(value = "locations", key = "'list'")
     public List<LocationDto> list(){
         List<Location> locations = locationRepository.findUntrashed();
 
         return locations.stream()
                 .map(location -> modelMapper.map(location, LocationDto.class)).toList();
+    }
+
+    public Page<Location> listByPage(int pageNum, int pageSize, String sortOption) {
+        Sort sort = Sort.by(sortOption).ascending();
+
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+        return locationRepository.findUntrashed(pageable);
     }
 
     @Cacheable(value = "locationDTO", key = "#code")

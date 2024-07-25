@@ -3,11 +3,15 @@ package com.WeatherAPI.controller;
 import com.WeatherAPI.aop.RateLimited;
 import com.WeatherAPI.dto.LocationDto;
 import com.WeatherAPI.entity.Location;
+import com.WeatherAPI.exception.BadRequestException;
 import com.WeatherAPI.exception.CodeConflictException;
 import com.WeatherAPI.service.LocationService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/locations")
@@ -37,7 +42,8 @@ public class LocationApiController {
         return ResponseEntity.created(uri).body(addedLocation);
     }
 
-    @GetMapping
+    @Deprecated
+   // @GetMapping
     @RateLimited
     public ResponseEntity<?> getAll(){
         List<LocationDto> dtoList = service.list();
@@ -45,6 +51,26 @@ public class LocationApiController {
             return ResponseEntity.noContent().build(); // status code 204
         }
         return new ResponseEntity<>(dtoList, HttpStatus.OK);
+    }
+
+    @RateLimited
+    @GetMapping
+    public ResponseEntity<?> listLocations(
+            @RequestParam(value = "page", required = false, defaultValue = "1") @Min(value = 1)	Integer pageNum,
+            @RequestParam(value = "size", required = false, defaultValue = "5") @Min(value = 5) @Max(value = 20) Integer pageSize,
+            @RequestParam(value = "sort", required = false, defaultValue = "code") String sortOption
+
+    ) throws BadRequestException {
+
+        Page<Location> page = service.listByPage(pageNum - 1, pageSize, sortOption);
+
+        List<Location> locations = page.getContent();
+
+        if (locations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(listEntity2ListDTO(locations));
     }
 
     @GetMapping("/{code}")
@@ -68,6 +94,21 @@ public class LocationApiController {
     public ResponseEntity<?> deleteLocation(@PathVariable("code") String code){
         service.delete(code);
         return ResponseEntity.noContent().build();
+    }
+
+    private List<LocationDto> listEntity2ListDTO(List<Location> listEntity) {
+
+        return listEntity.stream().map(this::entity2DTO)
+                .collect(Collectors.toList());
+
+    }
+
+    private LocationDto entity2DTO(Location entity) {
+        return modelMapper.map(entity, LocationDto.class);
+    }
+
+    private Location dto2Entity(LocationDto dto) {
+        return modelMapper.map(dto, Location.class);
     }
 
 }
