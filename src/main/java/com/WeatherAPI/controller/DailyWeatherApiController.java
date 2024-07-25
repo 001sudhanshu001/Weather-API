@@ -1,5 +1,6 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.aop.RateLimited;
 import com.WeatherAPI.dto.DailyWeatherDTO;
 import com.WeatherAPI.dto.DailyWeatherListDTO;
 import com.WeatherAPI.entity.DailyWeather;
@@ -30,6 +31,7 @@ public class DailyWeatherApiController {
     private final ModelMapper modelMapper;
 
     @GetMapping
+    @RateLimited
     public ResponseEntity<?> listDailyForecastByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIpAddress(request);
 
@@ -40,13 +42,12 @@ public class DailyWeatherApiController {
             return ResponseEntity.noContent().build();
         }
 
-        List<DailyWeatherDTO> dailyWeatherDTOS = dailyForecast.stream()
-                .map(dailyWeather -> modelMapper.map(dailyForecast, DailyWeatherDTO.class)).toList();
-
-        return ResponseEntity.ok(dailyWeatherDTOS);
+        DailyWeatherListDTO dto = listEntity2DTO(dailyForecast);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode) {
         List<DailyWeather> dailyForecast = dailyWeatherService.getByLocationCode(locationCode);
 
@@ -60,6 +61,7 @@ public class DailyWeatherApiController {
     }
 
     @PutMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> updateDailyForecast(@PathVariable("locationCode") String code,
                                                  @RequestBody @Valid List<DailyWeatherDTO> listDTO) throws BadRequestException {
 

@@ -1,6 +1,7 @@
 package com.WeatherAPI.controller;
 
 
+import com.WeatherAPI.aop.RateLimited;
 import com.WeatherAPI.dto.HourlyWeatherDto;
 import com.WeatherAPI.dto.HourlyWeatherListDto;
 import com.WeatherAPI.entity.HourlyWeather;
@@ -25,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/hourly")
 @RequiredArgsConstructor
-@Validated // So that HourlyWeatherDto provided in the list as JSON can be validate
+@Validated // So that HourlyWeatherDto provided in the list as JSON can be validated
 public class HourlyWeatherApiController {
     private  final HourlyWeatherService hourlyWeatherService;
     private final GeoLocationService geoLocationService;
@@ -33,6 +34,7 @@ public class HourlyWeatherApiController {
     private final ModelMapper modelMapper;
 
     @GetMapping         //request is required to get ip and hour of the day
+    @RateLimited
     public ResponseEntity<?> listHourlyForecastByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIpAddress(request);
 
@@ -59,6 +61,7 @@ public class HourlyWeatherApiController {
     //request is required to get hour of the day. This method will return the Weather of upcoming hours
     // i.e. if current hour is 5 then it will then it will return the Weather after 4 hours
     @GetMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> listHourlyForecastByLocationCode(@PathVariable("locationCode") String locationCode,
                                                               HttpServletRequest request) {
         try{
@@ -80,6 +83,7 @@ public class HourlyWeatherApiController {
     }
 
     @PutMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> updateHourlyForecast(@PathVariable("locationCode") String locationCode,
                         @RequestBody @Valid List<HourlyWeatherDto> listDto) throws BadRequestException {
 

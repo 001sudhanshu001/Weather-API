@@ -1,5 +1,6 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.aop.RateLimited;
 import com.WeatherAPI.dto.FullWeatherDTO;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.BadRequestException;
@@ -24,17 +25,18 @@ public class FullWeatherApiController {
     private final ModelMapper modelMapper;
 
     @GetMapping
+    @RateLimited
     public ResponseEntity<?> getFullWeatherByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIpAddress(request);
 
         Location locationFromIP = geoLocationService.getLocationFromIpAddress(ipAddress);
-        System.out.println("Location from IP is " + locationFromIP);
         Location locationInDB = fullWeatherService.getLocation(locationFromIP);
 
         return ResponseEntity.ok(entity2DTO(locationInDB));
     }
 
     @GetMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> getFullWeatherByLocationCode(@PathVariable String locationCode) {
 
         Location locationInDB = fullWeatherService.getLocationByCode(locationCode);
@@ -43,6 +45,7 @@ public class FullWeatherApiController {
     }
 
     @PutMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> updateFullWeather(@PathVariable String locationCode,
                                                @RequestBody @Valid FullWeatherDTO dto)  {
 
@@ -61,12 +64,11 @@ public class FullWeatherApiController {
         return ResponseEntity.ok(entity2DTO(updatedLocation));
     }
 
-
     
     private FullWeatherDTO entity2DTO(Location entity) {
         FullWeatherDTO dto = modelMapper.map(entity, FullWeatherDTO.class);
 
-        // do not show the field location in realtime_weather object other wise Location will be duplicate in Response
+        // do not show the field location in realtime_weather object otherwise Location will be duplicate in Response
         dto.getRealTimeWeather().setLocation(null);
         return dto;
     }

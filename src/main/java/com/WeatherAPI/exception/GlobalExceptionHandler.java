@@ -17,7 +17,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -52,6 +54,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(ex.getMessage(), ex);
 
         return errorDTO;
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public Map<String, String> handleRateLimitExceeded(RateLimitExceededException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        response.put("retryAfter", "60 seconds");
+        return response;
     }
 
     @ExceptionHandler(LocationNotFoundException.class)

@@ -1,5 +1,6 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.aop.RateLimited;
 import com.WeatherAPI.dto.LocationDto;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.CodeConflictException;
@@ -37,6 +38,7 @@ public class LocationApiController {
     }
 
     @GetMapping
+    @RateLimited
     public ResponseEntity<?> getAll(){
         List<Location> locations = service.list();
 
@@ -51,6 +53,7 @@ public class LocationApiController {
     }
 
     @GetMapping("/{code}")
+    @RateLimited
     public ResponseEntity<?> getByCode(@PathVariable("code") String code){
         Location location = service.get(code);
 
@@ -58,6 +61,7 @@ public class LocationApiController {
     }
 
     @PutMapping
+    @RateLimited
     public ResponseEntity<?> updateByCode(@RequestBody @Valid LocationDto locationDto){
         Location location = modelMapper.map(locationDto, Location.class);
         Location updatedLocation = service.update(location);

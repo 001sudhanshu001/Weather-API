@@ -1,5 +1,6 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.aop.RateLimited;
 import com.WeatherAPI.dto.RealTimeWeatherDto;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
@@ -28,6 +29,7 @@ public class RealTimeWeatherController {
     private final ModelMapper modelMapper;
 
     @GetMapping
+    @RateLimited
     public ResponseEntity<?> getRealTimeWeatherByIPAddress(HttpServletRequest request){
         String ipAddress = CommonUtility.getIpAddress(request);
 
@@ -51,6 +53,7 @@ public class RealTimeWeatherController {
     }
 
     @GetMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> getRealTimeWeatherByLocationCode(@PathVariable("locationCode") String locationCode){
         try{
             RealTimeWeather byLocationCode = realTimeWeatherService.getByLocationCode(locationCode);
@@ -65,6 +68,7 @@ public class RealTimeWeatherController {
 
 
     @PutMapping("/{locationCode}")
+    @RateLimited
     public ResponseEntity<?> updateRealTimeWeatherByLocationCode(@PathVariable("locationCode") String locationCode,
                                                                  @RequestBody @Valid RealTimeWeatherDto dtoInRequest) {
         try {
