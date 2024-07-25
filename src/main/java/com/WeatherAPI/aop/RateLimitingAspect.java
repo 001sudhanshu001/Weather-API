@@ -2,6 +2,7 @@ package com.WeatherAPI.aop;
 
 import com.WeatherAPI.exception.RateLimitExceededException;
 import com.WeatherAPI.utils.CommonUtility;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.TimeUnit;
 
 import static com.WeatherAPI.constants.RateLimitingConstants.*;

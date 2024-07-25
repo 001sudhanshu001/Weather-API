@@ -3,10 +3,10 @@ package com.WeatherAPI.dto;
 import com.WeatherAPI.filter.RealTimeWeatherFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 

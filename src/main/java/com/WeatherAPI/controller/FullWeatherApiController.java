@@ -7,13 +7,12 @@ import com.WeatherAPI.exception.BadRequestException;
 import com.WeatherAPI.service.FullWeatherService;
 import com.WeatherAPI.service.GeoLocationService;
 import com.WeatherAPI.utils.CommonUtility;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/v1/full")

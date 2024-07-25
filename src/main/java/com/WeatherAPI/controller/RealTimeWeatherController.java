@@ -9,6 +9,8 @@ import com.WeatherAPI.exception.LocationNotFoundException;
 import com.WeatherAPI.service.GeoLocationService;
 import com.WeatherAPI.service.RealTimeWeatherService;
 import com.WeatherAPI.utils.CommonUtility;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -16,8 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/v1/realtime")

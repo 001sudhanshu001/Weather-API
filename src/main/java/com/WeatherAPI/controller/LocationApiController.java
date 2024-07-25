@@ -4,18 +4,17 @@ import com.WeatherAPI.aop.RateLimited;
 import com.WeatherAPI.dto.LocationDto;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.CodeConflictException;
-import com.WeatherAPI.exception.LocationNotFoundException;
 import com.WeatherAPI.service.LocationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/locations")

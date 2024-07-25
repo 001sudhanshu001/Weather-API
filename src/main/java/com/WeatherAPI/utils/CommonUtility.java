@@ -1,9 +1,8 @@
 package com.WeatherAPI.utils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class CommonUtility {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtility.class);

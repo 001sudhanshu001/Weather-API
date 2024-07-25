@@ -9,14 +9,14 @@ import com.WeatherAPI.exception.BadRequestException;
 import com.WeatherAPI.service.DailyWeatherService;
 import com.WeatherAPI.service.GeoLocationService;
 import com.WeatherAPI.utils.CommonUtility;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
