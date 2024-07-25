@@ -3,12 +3,13 @@ package com.WeatherAPI.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
-public class HourlyWeatherListDto {
+public class HourlyWeatherListDto extends RepresentationModel<HourlyWeatherListDto> {
     private String location;
 
     @JsonProperty("hourly_forecast")

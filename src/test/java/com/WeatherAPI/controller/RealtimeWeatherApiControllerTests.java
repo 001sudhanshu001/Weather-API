@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 @WebMvcTest(RealTimeWeatherController.class)
 public class RealtimeWeatherApiControllerTests {
     private static final  String END_POINT_PATH = "/v1/realtime";
