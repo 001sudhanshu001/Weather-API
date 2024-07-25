@@ -211,22 +211,25 @@ public class LocationApiControllerTest {
 
         Sort sort = Sort.by(sortField);
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sort);
-        PageImpl<Location> page = new PageImpl<>(List.of(location1, location2));
 
+        PageImpl<Location> page = new PageImpl<>(listLocations, pageable, totalElements);
 
-        Mockito.when(service.listByPage(anyInt(), anyInt(), anyString()))
+        Mockito.when(service.listByPage(pageNum - 1, pageSize, sortField))
                 .thenReturn(page);
 
         String requestURI = END_POINT_PATH + "?page=" + pageNum + "&size=" + pageSize + "&sort=" + sortField;
 
-
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$[0].code", is("MUB")))
-                .andExpect(jsonPath("$[0].city_name", is("Mumbai")))
-                .andExpect(jsonPath("$[1].code", is("DELHI_IN")))
-                .andExpect(jsonPath("$[1].city_name", is("Delhi")))
+                .andExpect(content().contentType("application/hal+json"))
+                .andExpect(jsonPath("$._embedded.locations[0].code", is("MUB")))
+                .andExpect(jsonPath("$._embedded.locations[0].city_name", is("Mumbai")))
+                .andExpect(jsonPath("$._embedded.locations[1].code", is("DELHI_IN")))
+                .andExpect(jsonPath("$._embedded.locations[1].city_name", is("Delhi")))
+                .andExpect(jsonPath("$.page.size", is(pageSize)))
+                .andExpect(jsonPath("$.page.number", is(pageNum)))
+                .andExpect(jsonPath("$.page.total_elements", is(totalElements)))
+                .andExpect(jsonPath("$.page.total_pages", is(1)))
                 .andDo(print());
     }
 

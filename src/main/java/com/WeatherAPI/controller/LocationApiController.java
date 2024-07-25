@@ -12,11 +12,13 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.net.URI;
 import java.util.List;
@@ -90,7 +92,23 @@ public class LocationApiController {
            return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(listEntity2ListDTO(locations));
+        List<LocationDto> locationDtos = listEntity2ListDTO(locations);
+        return ResponseEntity.ok(addPageMetadata(locationDtos, page));
+    }
+
+    private CollectionModel<LocationDto> addPageMetadata(List<LocationDto> listDTO, Page<Location> pageInfo)
+            throws BadRequestException {
+
+        int pageSize = pageInfo.getSize();
+        int pageNum = pageInfo.getNumber() + 1;
+        long totalElements = pageInfo.getTotalElements();
+
+        PageMetadata pageMetadata = new PageMetadata(pageSize, pageNum, totalElements);
+
+        CollectionModel<LocationDto> collectionModel = PagedModel.of(listDTO, pageMetadata);
+
+        return collectionModel;
+
     }
 
     @GetMapping("/{code}")

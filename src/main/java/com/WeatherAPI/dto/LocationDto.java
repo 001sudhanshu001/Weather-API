@@ -9,15 +9,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serializable;
-
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonPropertyOrder({"code", "city_name", "region_name", "country_code", "country_name", "enabled"})
+@Relation(collectionRelation = "locations") // This is for HATEOAS
 public class LocationDto implements Serializable {
 
     @NotNull(message = "Location Code cannot be null")
