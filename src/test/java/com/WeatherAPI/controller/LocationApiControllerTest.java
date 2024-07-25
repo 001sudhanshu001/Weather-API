@@ -142,7 +142,7 @@ public class LocationApiControllerTest {
 
     @Test
     public void testListShouldReturn200() throws Exception {
-        Location location1 = new Location();
+        LocationDto location1 = new LocationDto();
         location1.setCode("SMK");
         location1.setCityName("Samalkha");
         location1.setRegionName("Panipat");
@@ -150,7 +150,7 @@ public class LocationApiControllerTest {
         location1.setCountryName("India");
         location1.setEnabled(true);
 
-        Location location2 = new Location();
+        LocationDto location2 = new LocationDto();
         location2.setCode("PNP");
         location2.setCityName("Panipat");
         location2.setRegionName("NCR");
@@ -195,7 +195,7 @@ public class LocationApiControllerTest {
         String locationCode = "MUB";
         String requestURI = END_POINT_PATH + "/" + locationCode;
 
-        Location location = new Location();
+        LocationDto location = new LocationDto();
         location.setCode("MUB");
         location.setCityName("Mumbai");
         location.setRegionName("Maharashtra");

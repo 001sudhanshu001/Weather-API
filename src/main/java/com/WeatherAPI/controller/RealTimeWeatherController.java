@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-
 @RestController
 @RequestMapping("/v1/realtime")
 @RequiredArgsConstructor
@@ -36,7 +34,6 @@ public class RealTimeWeatherController {
 
         try {
             Location locationFromIpAddress = geoLocationService.getLocationFromIpAddress(ipAddress);
-            System.out.println("Location From IP Address" + locationFromIpAddress);
 
             // Weather we have real Time data about this particular location otherwise throw LocationNotFoundException
             RealTimeWeather realTimeWeather = realTimeWeatherService.getWeatherByLocation(locationFromIpAddress);

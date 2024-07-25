@@ -10,13 +10,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.io.Serializable;
+
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonPropertyOrder({"code", "city_name", "region_name", "country_code", "country_name", "enabled"})
-public class LocationDto {
+public class LocationDto implements Serializable {
 
     @NotNull(message = "Location Code cannot be null")
     @Length(min = 3, max = 12, message = "Location code must have 3 to 12 characters")

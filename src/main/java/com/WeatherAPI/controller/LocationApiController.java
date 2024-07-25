@@ -24,6 +24,7 @@ public class LocationApiController {
     private final ModelMapper modelMapper;
 
     @PostMapping
+    @RateLimited
     public ResponseEntity<?> addLocation(@RequestBody @Valid LocationDto locationDto){
         LocationDto addedLocation;
         try {
@@ -39,24 +40,19 @@ public class LocationApiController {
     @GetMapping
     @RateLimited
     public ResponseEntity<?> getAll(){
-        List<Location> locations = service.list();
-
-        if(locations.isEmpty()){
+        List<LocationDto> dtoList = service.list();
+        if(dtoList.isEmpty()){
             return ResponseEntity.noContent().build(); // status code 204
         }
-
-        List<LocationDto> dtoList = locations.stream()
-                .map(location -> modelMapper.map(location, LocationDto.class)).toList();
-
         return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{code}")
     @RateLimited
     public ResponseEntity<?> getByCode(@PathVariable("code") String code){
-        Location location = service.get(code);
+        LocationDto locationDto = service.get(code);
 
-        return ResponseEntity.ok(modelMapper.map(location, LocationDto.class));
+        return ResponseEntity.ok(locationDto);
     }
 
     @PutMapping

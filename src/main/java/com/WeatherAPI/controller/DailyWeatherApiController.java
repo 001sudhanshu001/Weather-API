@@ -63,7 +63,8 @@ public class DailyWeatherApiController {
     @PutMapping("/{locationCode}")
     @RateLimited
     public ResponseEntity<?> updateDailyForecast(@PathVariable("locationCode") String code,
-                                                 @RequestBody @Valid List<DailyWeatherDTO> listDTO) throws BadRequestException {
+                                                 @RequestBody @Valid List<DailyWeatherDTO> listDTO)
+            throws BadRequestException {
 
         if (listDTO.isEmpty()) {
             throw new BadRequestException("Daily forecast data cannot be empty");

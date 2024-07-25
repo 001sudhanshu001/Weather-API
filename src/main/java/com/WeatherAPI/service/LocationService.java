@@ -1,10 +1,13 @@
 package com.WeatherAPI.service;
 
 import com.WeatherAPI.dao.LocationRepository;
+import com.WeatherAPI.dto.LocationDto;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.CodeConflictException;
 import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +18,7 @@ import java.util.List;
 @Transactional
 public class LocationService {
     private final LocationRepository locationRepository;
+    private final ModelMapper modelMapper;
 
     public Location addLocation(Location location) throws CodeConflictException {
         // Checking uniqueness of code
@@ -28,14 +32,21 @@ public class LocationService {
         return locationRepository.save(location);
     }
 
-    public List<Location> list(){
-        return locationRepository.findUntrashed();
+    @Cacheable(value = "locations", key = "'list'")
+    public List<LocationDto> list(){
+        List<Location> locations = locationRepository.findUntrashed();
+
+        return locations.stream()
+                .map(location -> modelMapper.map(location, LocationDto.class)).toList();
     }
 
-    public Location get(String code){
-        return locationRepository
+    @Cacheable(value = "locationDTO", key = "#code")
+    public LocationDto get(String code){
+        Location location = locationRepository
                 .findByCode(code)
                 .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
+
+        return modelMapper.map(location, LocationDto.class);
     }
 
     public Location update(Location locationInRequest) throws LocationNotFoundException {
