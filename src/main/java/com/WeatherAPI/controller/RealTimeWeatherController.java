@@ -36,9 +36,8 @@ public class RealTimeWeatherController {
             Location locationFromIpAddress = geoLocationService.getLocationFromIpAddress(ipAddress);
 
             // Weather we have real Time data about this particular location otherwise throw LocationNotFoundException
-            RealTimeWeather realTimeWeather = realTimeWeatherService.getWeatherByLocation(locationFromIpAddress);
+            RealTimeWeatherDto weatherDto = realTimeWeatherService.getWeatherByLocation(locationFromIpAddress);
 
-            RealTimeWeatherDto weatherDto = modelMapper.map(realTimeWeather, RealTimeWeatherDto.class);
             return ResponseEntity.ok(weatherDto);
 
         } catch (GeoLocationException e) {
@@ -54,8 +53,7 @@ public class RealTimeWeatherController {
     @RateLimited
     public ResponseEntity<?> getRealTimeWeatherByLocationCode(@PathVariable("locationCode") String locationCode){
         try{
-            RealTimeWeather byLocationCode = realTimeWeatherService.getByLocationCode(locationCode);
-            RealTimeWeatherDto weatherDto = modelMapper.map(byLocationCode, RealTimeWeatherDto.class);
+            RealTimeWeatherDto weatherDto = realTimeWeatherService.getByLocationCode(locationCode);
 
             return ResponseEntity.ok(weatherDto);
         }catch (LocationNotFoundException e) {

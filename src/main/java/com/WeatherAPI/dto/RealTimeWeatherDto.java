@@ -9,10 +9,11 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Getter @Setter
-public class RealTimeWeatherDto {
+public class RealTimeWeatherDto implements Serializable {
 
     // ModelMapper map Location(reference) of RealTimeWeather to this location(String)
     // Because they have same name, Since we can't directly map reference to String

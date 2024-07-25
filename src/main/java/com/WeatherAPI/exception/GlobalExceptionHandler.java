@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.WeatherAPI.constants.RateLimitingConstants.TIME_WINDOW;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -63,7 +65,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public Map<String, String> handleRateLimitExceeded(RateLimitExceededException ex) {
         Map<String, String> response = new HashMap<>();
         response.put("error", ex.getMessage());
-        response.put("retryAfter", "60 seconds");
+        response.put("retryAfter", TIME_WINDOW + " seconds");
         return response;
     }
 

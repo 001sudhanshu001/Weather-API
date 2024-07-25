@@ -2,15 +2,16 @@ package com.WeatherAPI.service;
 
 import com.WeatherAPI.dao.LocationRepository;
 import com.WeatherAPI.dao.RealTimeWeatherRepo;
+import com.WeatherAPI.dto.RealTimeWeatherDto;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.entity.RealTimeWeather;
 import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLOutput;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,21 +19,31 @@ public class RealTimeWeatherService {
 
     private final RealTimeWeatherRepo realTimeWeatherRepo;
     private final LocationRepository locationRepository;
+    private final ModelMapper modelMapper;
 
-    public RealTimeWeather getWeatherByLocation(Location location) throws LocationNotFoundException {
+    @Cacheable(value = "realTimeWeatherDTO", key = "#location.getCountryCode() + '-' + #location.getCityName()")
+    public RealTimeWeatherDto getWeatherByLocation(Location location) throws LocationNotFoundException {
+        System.out.println(1);
         String countryCode = location.getCountryCode();
         String cityName = location.getCityName();
 
-        return realTimeWeatherRepo
+        RealTimeWeather realTimeWeather = realTimeWeatherRepo
                 .findByCountryCodeAndCity(countryCode, cityName)
-                .orElseThrow(() ->  new LocationNotFoundException(countryCode, cityName));
+                .orElseThrow(() -> new LocationNotFoundException(countryCode, cityName));
+
+        return modelMapper.map(realTimeWeather, RealTimeWeatherDto.class);
     }
 
-    public RealTimeWeather getByLocationCode(String locationCode) throws LocationNotFoundException {
-
-        return realTimeWeatherRepo
+    @Cacheable(value = "realTimeWeatherDTO", key = "#locationCode")
+    public RealTimeWeatherDto getByLocationCode(String locationCode) throws LocationNotFoundException {
+        System.out.println(2);
+        RealTimeWeather realTimeWeather = realTimeWeatherRepo
                 .findByLocationCode(locationCode)
-                .orElseThrow(() -> new LocationNotFoundException("No Location found with the given code:" + locationCode));
+                .orElseThrow(() -> new LocationNotFoundException(
+                        "No Location found with the given code:" + locationCode
+                ));
+
+        return modelMapper.map(realTimeWeather, RealTimeWeatherDto.class);
     }
 
     public RealTimeWeather update(String locationCode, RealTimeWeather weather) {

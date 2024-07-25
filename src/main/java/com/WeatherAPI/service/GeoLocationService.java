@@ -26,11 +26,12 @@ public class GeoLocationService {
         }
     }
 
+    // TODO -> Caching on ipAddress
     public Location getLocationFromIpAddress(String ipAddress) throws GeoLocationException {
         try {
             IPResult result = ipLocator.IPQuery(ipAddress);
             
-            LOGGER.info(result.toString());
+          //  LOGGER.info(result.toString());
 
             if(!result.getStatus().equals("OK")){
                 throw new GeoLocationException("GeoLocation failed with status " + result.getStatus());
