@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serializable;
@@ -19,7 +20,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @JsonPropertyOrder({"code", "city_name", "region_name", "country_code", "country_name", "enabled"})
 @Relation(collectionRelation = "locations") // This is for HATEOAS
-public class LocationDto implements Serializable {
+public class LocationDto extends CollectionModel<LocationDto> implements Serializable {
 
     @NotNull(message = "Location Code cannot be null")
     @Length(min = 3, max = 12, message = "Location code must have 3 to 12 characters")

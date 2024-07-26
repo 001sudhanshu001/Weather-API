@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/v1/locations")
@@ -74,8 +78,10 @@ public class LocationApiController {
     @RateLimited
     @GetMapping
     public ResponseEntity<?> listLocations(
-            @RequestParam(value = "page", required = false, defaultValue = "1") @Min(value = 1)	Integer pageNum,
-            @RequestParam(value = "size", required = false, defaultValue = "5") @Min(value = 5) @Max(value = 20) Integer pageSize,
+            @RequestParam(value = "page", required = false, defaultValue = "1")
+                    @Min(value = 1)	Integer pageNum,
+            @RequestParam(value = "size", required = false, defaultValue = "5")
+                    @Min(value = 5) @Max(value = 20) Integer pageSize,
             @RequestParam(value = "sort", required = false, defaultValue = "code") String sortField
 
     ) throws BadRequestException {
@@ -93,19 +99,50 @@ public class LocationApiController {
         }
 
         List<LocationDto> locationDtos = listEntity2ListDTO(locations);
-        return ResponseEntity.ok(addPageMetadata(locationDtos, page));
+        return ResponseEntity.ok(addPageMetadata(locationDtos, page, sortField));
     }
 
-    private CollectionModel<LocationDto> addPageMetadata(List<LocationDto> listDTO, Page<Location> pageInfo)
+    private CollectionModel<LocationDto> addPageMetadata(List<LocationDto> listDTO,
+                                                         Page<Location> pageInfo, String sortFiled)
             throws BadRequestException {
+
+        for (LocationDto dto : listDTO) {
+            dto.add(linkTo(methodOn(LocationApiController.class).getByCode(dto.getCode())).withSelfRel());
+        }
 
         int pageSize = pageInfo.getSize();
         int pageNum = pageInfo.getNumber() + 1;
         long totalElements = pageInfo.getTotalElements();
+        int totalPages = pageInfo.getTotalPages();;
 
         PageMetadata pageMetadata = new PageMetadata(pageSize, pageNum, totalElements);
 
         CollectionModel<LocationDto> collectionModel = PagedModel.of(listDTO, pageMetadata);
+
+        // self link to collectionModle
+        collectionModel.add(linkTo(methodOn(LocationApiController.class)
+                .listLocations(pageNum, pageSize, sortFiled)).withSelfRel()
+        );
+
+        if(pageNum > 1) {
+            collectionModel.add(linkTo(methodOn(LocationApiController.class) // first page
+                    .listLocations(1, pageSize, sortFiled)).withRel(IanaLinkRelations.FIRST)
+            );
+
+            collectionModel.add(linkTo(methodOn(LocationApiController.class) // prev page
+                    .listLocations(pageNum - 1, pageSize, sortFiled)).withRel(IanaLinkRelations.PREV)
+            );
+        }
+
+        if(pageNum < totalPages) {
+            collectionModel.add(linkTo(methodOn(LocationApiController.class) // next page
+                    .listLocations(pageNum + 1, pageSize, sortFiled)).withRel(IanaLinkRelations.NEXT)
+            );
+
+            collectionModel.add(linkTo(methodOn(LocationApiController.class) // last page
+                    .listLocations(totalPages, pageSize, sortFiled)).withRel(IanaLinkRelations.LAST)
+            );
+        }
 
         return collectionModel;
 

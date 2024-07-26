@@ -120,7 +120,8 @@ public class LocationApiControllerTest {
 
         String bodyContent = mapper.writeValueAsString(location);
 
-        MvcResult mvcResult = mockMvc.perform(post(END_POINT_PATH).contentType("application/json").content(bodyContent))
+        MvcResult mvcResult = mockMvc.perform(post(END_POINT_PATH).contentType("application/json")
+                        .content(bodyContent))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
                 .andDo(print())
@@ -246,7 +247,8 @@ public class LocationApiControllerTest {
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", containsString("must be greater than or equal to 1")))
+                .andExpect(jsonPath("$.errors[0]",
+                        containsString("must be greater than or equal to 1")))
                 .andDo(print());
     }
 
@@ -263,7 +265,8 @@ public class LocationApiControllerTest {
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", containsString("must be greater than or equal to 5")))
+                .andExpect(jsonPath("$.errors[0]",
+                        containsString("must be greater than or equal to 5")))
                 .andDo(print());
         // This message is the Default of @Min() from jakarta.validation.constraints.Min.message = must be greater than or equal to {value}
     }
@@ -281,7 +284,8 @@ public class LocationApiControllerTest {
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", containsStringIgnoringCase("invalid sort field")))
+                .andExpect(jsonPath("$.errors[0]",
+                        containsStringIgnoringCase("invalid sort field")))
                 .andDo(print());
     }
 
@@ -340,7 +344,9 @@ public class LocationApiControllerTest {
         location.setCountryName("India");
         location.setEnabled(true);
 
-        Mockito.when(service.update(Mockito.any())).thenThrow(new LocationNotFoundException("No Location Found with the code"));
+        Mockito.when(service.update(Mockito.any()))
+                .thenThrow(new LocationNotFoundException("No Location Found with the code"));
+
         String bodyContent = mapper.writeValueAsString(location);
 
         mockMvc.perform(put(END_POINT_PATH).contentType("application/json").content(bodyContent))
