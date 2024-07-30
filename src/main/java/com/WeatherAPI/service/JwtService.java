@@ -5,22 +5,21 @@ import com.WeatherAPI.security.enums.TokenType;
 import com.WeatherAPI.security.jwt.JwtTokenProperty;
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,6 +79,51 @@ public class JwtService {
                 .setExpiration(willExpireOn)
                 .signWith(signatureKey, JwtTokenProperty.SIGNATURE_ALGORITHM)
                 .compact();
+    }
+
+    public boolean isValidToken(String token) {
+        boolean validationResult = false;
+        try {
+            Jwts.parserBuilder().setSigningKey(signatureKey).build().parse(token);
+
+            // TODO : Check if the Token is from a logged out device
+            validationResult = true;
+        } catch (SecurityException e) {
+            log.error("Invalid JWT signature: {}. Token was: {}", e.getMessage(), token);
+        } catch (MalformedJwtException e) {
+            log.error("Malformed JWT: {}. Token was: {}", e.getMessage(), token);
+        } catch (ExpiredJwtException e) {
+            log.debug("JWT token is expired: {}. Token is: {}", e.getMessage(), token);
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT exception: {}. Token was: {}", e.getMessage(), token);
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty:: {}", e.getMessage());
+        }
+        return validationResult;
+    }
+
+    public UsernamePasswordAuthenticationToken createAuthentication(String token) {
+        Claims claims = extractAllClaims(token);
+
+        String scopesString = claims.get(JwtTokenProperty.AUTHORITY_KEY).toString();
+        String[] authStrings = scopesString.split(",");
+
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(authStrings)
+                .map(SimpleGrantedAuthority::new)
+                .toList();
+
+        String subject = claims.getSubject();
+        User principal = new User(subject, "", authorities);
+
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    private Claims extractAllClaims(String token) throws ExpiredJwtException, UnsupportedJwtException,
+            MalformedJwtException, SecurityException, IllegalArgumentException {
+        return Jwts.parserBuilder()
+                .setSigningKey(signatureKey).build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public Date getTokenExpiryFromExpiredJWT(String token) {

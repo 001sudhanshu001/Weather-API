@@ -1,9 +1,6 @@
 package com.WeatherAPI.controller;
 
-import com.WeatherAPI.security.dto.JwtAuthenticationResponse;
-import com.WeatherAPI.security.dto.RefreshTokenRequest;
-import com.WeatherAPI.security.dto.SignUpRequest;
-import com.WeatherAPI.security.dto.SigninRequest;
+import com.WeatherAPI.security.dto.*;
 import com.WeatherAPI.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +39,14 @@ public class AuthenticationController {
     public ResponseEntity<JwtAuthenticationResponse> refresh(
             @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(authenticationService.refresh(refreshTokenRequest));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(@Valid @RequestBody LogOutRequest logOutRequest) {
+        String userName = authenticationService.logout(logOutRequest);
+
+
+        return ResponseEntity.ok("User has successfully logged out from the system!");
     }
 
 }
