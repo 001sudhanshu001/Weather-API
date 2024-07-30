@@ -4,6 +4,8 @@ import com.WeatherAPI.security.enums.TokenType;
 import com.WeatherAPI.security.jwt.JwtTokenProperty;
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -78,4 +80,20 @@ public class JwtService {
                 .signWith(signatureKey, JwtTokenProperty.SIGNATURE_ALGORITHM)
                 .compact();
     }
+
+    public Date getTokenExpiryFromExpiredJWT(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(signatureKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getExpiration();
+        } catch (ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            return claims.getExpiration();
+        }
+    }
+
 }
