@@ -1,5 +1,7 @@
 package com.WeatherAPI.exception;
 
+import com.WeatherAPI.security.exception.ErrorResponse;
+import com.WeatherAPI.security.exception.JwtSecurityException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -83,6 +87,47 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(ex.getMessage(), ex);
 
         return errorDTO;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException accessDeniedException,
+                                                                     WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                new Date(), HttpStatus.FORBIDDEN.value(),
+                accessDeniedException.getMessage(), request.getDescription(false)
+        );
+        log.error(
+                "AccessDeniedException Happened On Request:: {}",
+                request.getDescription(true), accessDeniedException
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+
+    @ExceptionHandler(JwtSecurityException.class)
+    public ResponseEntity<ErrorResponse> handleJwtSecurityException(JwtSecurityException jwtSecurityException,
+                                                                    WebRequest request) {
+        JwtSecurityException.JWTErrorCode jwtErrorCode = jwtSecurityException.getJwtErrorCode();
+        ErrorResponse errorResponse = new ErrorResponse(
+                new Date(), jwtErrorCode.getErrorCode(),
+                jwtSecurityException.getMessage(), request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, jwtErrorCode.httpStatus());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException authenticationException,
+                                                                       WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                new Date(), HttpStatus.UNAUTHORIZED.value(),
+                authenticationException.getMessage(), request.getDescription(false)
+        );
+        log.error(
+                "AuthenticationException Happened On Request:: {}",
+                request.getDescription(true), authenticationException
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
 //    @ExceptionHandler(ConstraintViolationException.class) // From javax.validation

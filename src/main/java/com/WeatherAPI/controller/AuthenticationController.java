@@ -1,6 +1,7 @@
 package com.WeatherAPI.controller;
 
 import com.WeatherAPI.security.dto.JwtAuthenticationResponse;
+import com.WeatherAPI.security.dto.RefreshTokenRequest;
 import com.WeatherAPI.security.dto.SignUpRequest;
 import com.WeatherAPI.security.dto.SigninRequest;
 import com.WeatherAPI.service.AuthenticationService;
@@ -35,6 +36,12 @@ public class AuthenticationController {
         JwtAuthenticationResponse jwtAuthenticationResponse = authenticationService.signin(request);
 
         return ResponseEntity.ok(jwtAuthenticationResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtAuthenticationResponse> refresh(
+            @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+        return ResponseEntity.ok(authenticationService.refresh(refreshTokenRequest));
     }
 
 }

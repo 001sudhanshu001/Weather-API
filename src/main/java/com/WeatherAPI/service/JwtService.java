@@ -1,5 +1,6 @@
 package com.WeatherAPI.service;
 
+import com.WeatherAPI.security.dto.UserDetailsImpl;
 import com.WeatherAPI.security.enums.TokenType;
 import com.WeatherAPI.security.jwt.JwtTokenProperty;
 import com.github.f4b6a3.ulid.Ulid;
@@ -94,6 +95,33 @@ public class JwtService {
             Claims claims = e.getClaims();
             return claims.getExpiration();
         }
+    }
+
+    public String getUserNameFromJWT(String token) {
+        try{
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(signatureKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getSubject();
+        } catch(ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            return claims.getSubject();
+        }
+    }
+
+    public String generateAccessToken(UserDetailsImpl userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        String authorities = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        extraClaims.put(JwtTokenProperty.AUTHORITY_KEY, authorities);
+        return getAccessToken(extraClaims, userDetails, System.currentTimeMillis());
     }
 
 }
