@@ -23,28 +23,40 @@ public class AuthenticationController {
     public ResponseEntity<JwtAuthenticationResponse> signup(
             @RequestBody @Valid SignUpRequest request) {
 
-        System.out.println("Controller Called ");
         return ResponseEntity.ok(authenticationService.signup(request));
     }
 
     @PostMapping("/signin")
     public ResponseEntity<JwtAuthenticationResponse> signin(
             @RequestBody @Valid SigninRequest request) {
-        JwtAuthenticationResponse jwtAuthenticationResponse = authenticationService.signin(request);
+
+        JwtAuthenticationResponse jwtAuthenticationResponse =
+                authenticationService.signin(request);
 
         return ResponseEntity.ok(jwtAuthenticationResponse);
     }
 
+    @PostMapping("/signin-exclusively")
+    public ResponseEntity<JwtAuthenticationResponse> signInExclusively(
+            @RequestBody @Valid SigninRequest request) {
+
+        JwtAuthenticationResponse jwtAuthenticationResponse =
+                authenticationService.signinExclusively(request);
+
+        return ResponseEntity.ok(jwtAuthenticationResponse);
+    }
+
+
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthenticationResponse> refresh(
             @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+
         return ResponseEntity.ok(authenticationService.refresh(refreshTokenRequest));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(@Valid @RequestBody LogOutRequest logOutRequest) {
         String userName = authenticationService.logout(logOutRequest);
-
 
         return ResponseEntity.ok("User has successfully logged out from the system!");
     }

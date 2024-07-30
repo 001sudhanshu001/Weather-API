@@ -98,7 +98,7 @@ public class AuthenticationService {
         return JwtAuthenticationResponse.builder()
                 .accessToken(tokenMappedByType.get(TokenType.ACCESS_TOKEN))
                 .refreshToken(tokenMappedByType.get(TokenType.REFRESH_TOKEN))
-                .loggedOutSessions(logoutSessions) // This is added to Trigger logout session in Controller
+                .loggedOutSessions(logoutSessions)
                 .userName(request.getUserName())
                 .build();
     }
@@ -125,10 +125,8 @@ public class AuthenticationService {
             return;
         }
 
-        // Delete InActive Sessions From Database
         userSessionDetailRepository.deleteAll(inActiveUserSessions);
 
-        // Remove From Session List
         sessions.removeAll(inActiveUserSessions);
     }
 
@@ -271,7 +269,6 @@ public class AuthenticationService {
         String accessToken = logOutRequest.getAccessToken();
         String refreshToken = logOutRequest.getRefreshToken();
 
-        // Since /logout url is secured, so in JWT the userName will be valid which will be in DB also
         String userName = jwtService.getUserNameFromJWT(accessToken);
 
         AppUser user = userRepository.findByEmail(userName).orElseThrow(() ->
@@ -302,4 +299,38 @@ public class AuthenticationService {
         return userName;
     }
 
+    @Transactional
+    public JwtAuthenticationResponse signinExclusively(SigninRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
+        );
+
+        AppUser user = userRepository
+                .findByEmail(request.getUserName())
+                .orElseThrow(
+                        () -> new JwtSecurityException(
+                                JwtSecurityException.JWTErrorCode.USER_NOT_FOUND,
+                                "Invalid email or password"
+                        )
+                );
+
+        // TODO : Even after deleting the session the User will be allowed to access Resource
+        //  for token expiration duration. This is something we have to bear as per the business needs,
+        //  Because for each request we can't validate the Token from the DB
+        //  or we can use ExpireMap to store the tokens in memory, again it totally depends on business needs
+        List<UserSession> sessions = user.getUserSessions();
+        if (!sessions.isEmpty()) { // Delete all sessions related to this user
+            userSessionDetailRepository.deleteAllInBatch(sessions);
+        }
+
+        var tokenMappedByType = jwtService.generateBothToken(new UserDetailsImpl(user));
+        saveLoginSession(tokenMappedByType, user); // Create a new Session for this user
+
+        return JwtAuthenticationResponse.builder()
+                .accessToken(tokenMappedByType.get(TokenType.ACCESS_TOKEN))
+                .refreshToken(tokenMappedByType.get(TokenType.REFRESH_TOKEN))
+                .userName(request.getUserName())
+                .loggedOutSessions(sessions)
+                .build();
+    }
 }
