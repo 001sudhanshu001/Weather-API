@@ -1,4 +1,4 @@
-package com.WeatherAPI.security.properties;
+package com.WeatherAPI.security.jwt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Getter;

@@ -1,8 +1,15 @@
 package com.WeatherAPI.controller;
 
+import com.WeatherAPI.security.dto.JwtAuthenticationResponse;
+import com.WeatherAPI.security.dto.SignUpRequest;
+import com.WeatherAPI.security.dto.SigninRequest;
 import com.WeatherAPI.service.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,5 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<JwtAuthenticationResponse> signup(
+            @RequestBody @Valid SignUpRequest request) {
+
+        System.out.println("Controller Called ");
+        return ResponseEntity.ok(authenticationService.signup(request));
+    }
 
 }
