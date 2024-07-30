@@ -1,5 +1,6 @@
 package com.WeatherAPI.dao;
 
+import com.WeatherAPI.dao.filter.FilterableLocationRepository;
 import com.WeatherAPI.entity.Location;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface LocationRepository extends JpaRepository<Location, String> {
+public interface LocationRepository extends JpaRepository<Location, String>, FilterableLocationRepository {
 
     @Deprecated
     @Query("SELECT l FROM Location l WHERE l.trashed = false")
