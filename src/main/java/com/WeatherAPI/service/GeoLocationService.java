@@ -6,6 +6,7 @@ import com.ip2location.IP2Location;
 import com.ip2location.IPResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class GeoLocationService {
     }
 
     // TODO -> Caching on ipAddress
+    @Cacheable(value = "locationByIp", key = "#ipAddress")
     public Location getLocationFromIpAddress(String ipAddress) throws GeoLocationException {
         try {
             IPResult result = ipLocator.IPQuery(ipAddress);

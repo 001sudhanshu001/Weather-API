@@ -46,7 +46,6 @@ public class FullWeatherApiController {
 
         Location locationInDB = fullWeatherService.getLocationByCode(locationCode);
 
-        FullWeatherDTO fullWeatherDTO = entity2DTO(locationInDB);
         return ResponseEntity.ok(addLinksByLocation(entity2DTO(locationInDB), locationCode));
     }
 
