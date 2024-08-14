@@ -34,9 +34,8 @@ public class FullWeatherApiController {
         String ipAddress = CommonUtility.getIpAddress(request);
 
         Location locationFromIP = geoLocationService.getLocationFromIpAddress(ipAddress);
-        Location locationInDB = fullWeatherService.getLocation(locationFromIP);
+        FullWeatherDTO fullWeatherDTO = fullWeatherService.getLocation(locationFromIP);
 
-        FullWeatherDTO fullWeatherDTO = entity2DTO(locationInDB);
         return ResponseEntity.ok(addLinksByIp(fullWeatherDTO));
     }
 
@@ -44,9 +43,9 @@ public class FullWeatherApiController {
     @RateLimited
     public ResponseEntity<?> getFullWeatherByLocationCode(@PathVariable String locationCode) {
 
-        Location locationInDB = fullWeatherService.getLocationByCode(locationCode);
+        FullWeatherDTO fullWeatherDTO = fullWeatherService.getLocationByCode(locationCode);
 
-        return ResponseEntity.ok(addLinksByLocation(entity2DTO(locationInDB), locationCode));
+        return ResponseEntity.ok(addLinksByLocation(fullWeatherDTO, locationCode));
     }
 
     @PutMapping("/{locationCode}")

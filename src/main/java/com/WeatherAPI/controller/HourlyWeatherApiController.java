@@ -36,22 +36,23 @@ public class HourlyWeatherApiController {
 
     private final ModelMapper modelMapper;
 
-    @GetMapping         //request is required to get ip and hour of the day
+    @GetMapping
     @RateLimited
     public ResponseEntity<?> listHourlyForecastByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIpAddress(request);
 
         try {
             // Fetching hour of the day from the header
-            int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));// This can throw NumberFormatException if header is null
+            int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
             Location locationFromIp = geoLocationService.getLocationFromIpAddress(ipAddress);
 
-            List<HourlyWeather> hourlyForecast = hourlyWeatherService.getByLocation(locationFromIp, currentHour);
+            HourlyWeatherListDto hourlyWeatherListDto =
+                    hourlyWeatherService.getByLocation(locationFromIp, currentHour);
 
-            if(hourlyForecast.isEmpty()){
+            if(hourlyWeatherListDto.getHourlyForecast().isEmpty()){
                 return ResponseEntity.noContent().build();
             }
-            HourlyWeatherListDto hourlyWeatherListDto = listEntity2DTO(hourlyForecast);
+
             return ResponseEntity.ok(addLinksByIP(hourlyWeatherListDto));
 
         } catch (GeoLocationException | NumberFormatException e) {
@@ -71,13 +72,13 @@ public class HourlyWeatherApiController {
         try{
             int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
 
-            List<HourlyWeather> hourlyForecast = hourlyWeatherService.getByLocationCode(locationCode, currentHour);
+            HourlyWeatherListDto hourlyWeatherListDto =
+                    hourlyWeatherService.getByLocationCode(locationCode, currentHour);
 
-            if(hourlyForecast.isEmpty()) {
+            if(hourlyWeatherListDto.getHourlyForecast().isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
 
-            HourlyWeatherListDto hourlyWeatherListDto = listEntity2DTO(hourlyForecast);
             return ResponseEntity.ok(addLinksByLocation(hourlyWeatherListDto, locationCode));
 
         } catch (LocationNotFoundException e) {

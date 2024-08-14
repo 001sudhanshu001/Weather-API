@@ -4,7 +4,10 @@ import com.WeatherAPI.dao.DailyWeatherRepository;
 import com.WeatherAPI.dao.LocationRepository;
 import com.WeatherAPI.dto.DailyWeatherDTO;
 import com.WeatherAPI.dto.DailyWeatherListDTO;
+import com.WeatherAPI.dto.HourlyWeatherDto;
+import com.WeatherAPI.dto.HourlyWeatherListDto;
 import com.WeatherAPI.entity.DailyWeather;
+import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -85,5 +88,6 @@ public class DailyWeatherService {
 
         return listDTO;
     }
+
 
 }

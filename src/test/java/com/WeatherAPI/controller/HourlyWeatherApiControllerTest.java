@@ -71,7 +71,9 @@ class HourlyWeatherApiControllerTest {
 
         Location location = new Location().code("MUB");
         when(geoLocationService.getLocationFromIpAddress(Mockito.anyString())).thenReturn(location);
-        when(hourlyWeatherService.getByLocation(location, currentHour)).thenReturn(new ArrayList<>());
+
+        // TODO -> Use HourlyWeatherListDto
+//        when(hourlyWeatherService.getByLocation(location, currentHour)).thenReturn(new ArrayList<>());
 
         mockMvc.perform(get(END_POINT_PATH).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
                 .andExpect(status().isNoContent()).andDo(print());
@@ -111,7 +113,9 @@ class HourlyWeatherApiControllerTest {
         hourlyWeatherList.add(forecast2);
 
         when(geoLocationService.getLocationFromIpAddress(Mockito.anyString())).thenReturn(location);
-        when(hourlyWeatherService.getByLocation(location, currentHour)).thenReturn(hourlyWeatherList);
+
+        // TODO -> User HourlyWeatherListDto
+//        when(hourlyWeatherService.getByLocation(location, currentHour)).thenReturn(hourlyWeatherList);
 
         String expectedLocation = location.toString();
 
@@ -159,7 +163,8 @@ class HourlyWeatherApiControllerTest {
         String locationCode = "MUB";
         String requestURI = END_POINT_PATH + "/" + locationCode;
 
-        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(Collections.emptyList());
+        // TODO -> Use DTO after code refactor
+//        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get(requestURI).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
                 .andExpect(status().isNoContent())
@@ -195,7 +200,8 @@ class HourlyWeatherApiControllerTest {
 
         var hourlyForecast = List.of(forecast1, forecast2);
 
-        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(hourlyForecast);
+        // TODO -> Use DTO after code refactor
+//        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(hourlyForecast);
 
         mockMvc.perform(get(requestURI).header(X_CURRENT_HOUR, String.valueOf(currentHour)))
                 .andExpect(status().isOk())

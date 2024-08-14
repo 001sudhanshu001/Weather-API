@@ -134,7 +134,9 @@ public class FullWeatherApiControllerTest {
         location.setHourlyWeatherList(List.of(hourlyWeather1, hourlyWeather2));
 
         when(geoLocationService.getLocationFromIpAddress(Mockito.anyString())).thenReturn(location);
-        when(fullWeatherService.getLocation(location)).thenReturn(location);
+
+        // TODO -> Update to use DTO
+//        when(fullWeatherService.getLocation(location)).thenReturn(location);
 
         String expectedLocation = location.toString();
 
@@ -221,7 +223,8 @@ public class FullWeatherApiControllerTest {
 
         location.setHourlyWeatherList(List.of(hourlyForecast1, hourlyForecast2));
 
-        when(fullWeatherService.getLocationByCode(locationCode)).thenReturn(location);
+        // TODO -> Update to use DTO
+//        when(fullWeatherService.getLocationByCode(locationCode)).thenReturn(location);
 
         String expectedLocation = location.toString();
 

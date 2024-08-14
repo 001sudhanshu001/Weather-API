@@ -2,10 +2,14 @@ package com.WeatherAPI.service;
 
 import com.WeatherAPI.dao.HourlyWeatherRepository;
 import com.WeatherAPI.dao.LocationRepository;
+import com.WeatherAPI.dto.HourlyWeatherDto;
+import com.WeatherAPI.dto.HourlyWeatherListDto;
 import com.WeatherAPI.entity.HourlyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,8 +20,12 @@ import java.util.List;
 public class HourlyWeatherService {
     private final HourlyWeatherRepository hourlyRepo;
     private final LocationRepository locationRepository;
+    private final ModelMapper modelMapper;
 
-    public List<HourlyWeather> getByLocation(Location location, int currentHour)
+
+    @Cacheable(value = "hourlyWeatherByLocation", key = "#location.cityName + '-' + #location.regionName +" +
+            " '-' + #location.countryName + '-' + #location.countryCode + '-' + #currentHour")
+    public HourlyWeatherListDto getByLocation(Location location, int currentHour)
             throws LocationNotFoundException {
         String countryCode = location.getCountryCode();
         String cityName = location.getCityName();
@@ -28,17 +36,20 @@ public class HourlyWeatherService {
                         "No Location Found with the given country code and city name"
                 ));
 
-        return hourlyRepo.findByLocationCode(locationInDB.getCode(), currentHour);
+        List<HourlyWeather> hourlyWeatherList = hourlyRepo.findByLocationCode(locationInDB.getCode(), currentHour);
+        return listEntity2DTO(hourlyWeatherList);
 
     }
 
-    public List<HourlyWeather> getByLocationCode(String locationCode, int currentHour)
+    @Cacheable(value = "hourlyWeatherByLocationCode", key = "#locationCode + #currentHour")
+    public HourlyWeatherListDto getByLocationCode(String locationCode, int currentHour)
             throws LocationNotFoundException {
         Location locationInDB = locationRepository
                 .findByCode(locationCode)
                 .orElseThrow(() -> new LocationNotFoundException("No Location Found with the given code"));
 
-        return hourlyRepo.findByLocationCode(locationCode, currentHour);
+        List<HourlyWeather> hourlyWeatherList = hourlyRepo.findByLocationCode(locationCode, currentHour);
+        return listEntity2DTO(hourlyWeatherList);
 
     }
 
@@ -70,6 +81,20 @@ public class HourlyWeatherService {
         }
 
         return hourlyRepo.saveAll(hourlyWeatherInRequest);
+    }
+
+    private HourlyWeatherListDto listEntity2DTO(List<HourlyWeather> hourlyForecast){
+        Location location = hourlyForecast.get(0).getId().getLocation();
+
+        HourlyWeatherListDto listDto = new HourlyWeatherListDto();
+        listDto.setLocation(location.toString());
+
+        hourlyForecast.forEach((hourlyWeather -> {
+            HourlyWeatherDto dto = modelMapper.map(hourlyWeather, HourlyWeatherDto.class);
+            listDto.addWeatherHourlyDto(dto);
+        }));
+
+        return listDto;
     }
 
 }

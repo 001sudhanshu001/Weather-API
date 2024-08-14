@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
-public class HourlyWeatherListDto extends RepresentationModel<HourlyWeatherListDto> {
+public class HourlyWeatherListDto extends RepresentationModel<HourlyWeatherListDto> implements Serializable {
     private String location;
 
     @JsonProperty("hourly_forecast")

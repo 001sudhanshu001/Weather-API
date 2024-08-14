@@ -9,11 +9,13 @@ import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import java.io.Serializable;
+
 
 @Getter @Setter
 @JsonPropertyOrder({"hour_of_day", "temperature", "precipitation", "status"})
 @ToString
-public class HourlyWeatherDto {
+public class HourlyWeatherDto implements Serializable {
     @JsonProperty("hour_of_day")
     @Range(min = 0, max = 23, message = "Hour of day must be in between 0-23")
     private int hourOfDay;
