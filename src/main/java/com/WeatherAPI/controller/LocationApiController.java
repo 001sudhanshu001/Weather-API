@@ -37,7 +37,7 @@ public class LocationApiController {
     private final LocationService service;
     private final ModelMapper modelMapper;
 
-    private static Map<String, String> propertyMap = Map.of(
+    private static final Map<String, String> propertyMap = Map.of(
             "code", "code",
             "city_name", "cityName",
             "region_name", "regionName",
@@ -65,7 +65,7 @@ public class LocationApiController {
     }
 
     @Deprecated
-   // @GetMapping
+//    @GetMapping
     @RateLimited
     public ResponseEntity<?> getAll(){
         List<LocationDto> dtoList = service.list();
@@ -90,20 +90,19 @@ public class LocationApiController {
            throw new BadRequestException("Invalid sort field : " + sortField);
         }
 
-        Page<Location> page = service.listByPage(pageNum - 1, pageSize, propertyMap.get(sortField));
+        Page<LocationDto> page = service.listByPage(pageNum - 1, pageSize, propertyMap.get(sortField));
 
-        List<Location> locations = page.getContent();
-
-        if (locations.isEmpty()) {
-           return ResponseEntity.noContent().build();
+        if(page == null) {
+            return ResponseEntity.noContent().build();
         }
 
-        List<LocationDto> locationDtos = listEntity2ListDTO(locations);
+        List<LocationDto> locationDtos = page.getContent();
+
         return ResponseEntity.ok(addPageMetadata(locationDtos, page, sortField));
     }
 
     private CollectionModel<LocationDto> addPageMetadata(List<LocationDto> listDTO,
-                                                         Page<Location> pageInfo, String sortFiled)
+                                                         Page<LocationDto> pageInfo, String sortFiled)
             throws BadRequestException {
 
         for (LocationDto dto : listDTO) {

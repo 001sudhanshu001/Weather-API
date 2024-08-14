@@ -2,10 +2,14 @@ package com.WeatherAPI.service;
 
 import com.WeatherAPI.dao.DailyWeatherRepository;
 import com.WeatherAPI.dao.LocationRepository;
+import com.WeatherAPI.dto.DailyWeatherDTO;
+import com.WeatherAPI.dto.DailyWeatherListDTO;
 import com.WeatherAPI.entity.DailyWeather;
 import com.WeatherAPI.entity.Location;
 import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,8 +21,11 @@ public class DailyWeatherService {
 
     private final DailyWeatherRepository dailyWeatherRepository;
     private final LocationRepository locationRepository;
+    private final ModelMapper modelMapper;
 
-    public List<DailyWeather> getByLocation(Location location) {
+    @Cacheable(value = "dailyWeatherByLocation", key = "#location.cityName + '-' + #location.regionName +" +
+            " '-' + #location.countryName + '-' + #location.countryCode")
+    public DailyWeatherListDTO getByLocation(Location location) {
         String countryCode = location.getCountryCode();
         String cityName = location.getCityName();
 
@@ -26,15 +33,18 @@ public class DailyWeatherService {
                 .findByCountryNameAndCityName(countryCode, cityName)
                 .orElseThrow(() -> new LocationNotFoundException(countryCode, cityName));
 
-        return dailyWeatherRepository.findByLocationCode(locationInDB.getCode());
+        List<DailyWeather> dailyWeatherList = dailyWeatherRepository.findByLocationCode(locationInDB.getCode());
+        return listEntity2DTO(dailyWeatherList);
     }
 
-    public List<DailyWeather> getByLocationCode(String locationCode) {
+    @Cacheable(value = "dailyWeatherByCode", key = "#locationCode")
+    public DailyWeatherListDTO getByLocationCode(String locationCode) {
         Location location = locationRepository
                 .findByCode(locationCode)
                 .orElseThrow(() -> new LocationNotFoundException(locationCode));
 
-        return dailyWeatherRepository.findByLocationCode(locationCode);
+        List<DailyWeather> dailyWeatherList = dailyWeatherRepository.findByLocationCode(locationCode);
+        return listEntity2DTO(dailyWeatherList);
     }
 
     public List<DailyWeather> updateByLocationCode(String code, List<DailyWeather> dailyWeatherInRequest)
@@ -62,4 +72,18 @@ public class DailyWeatherService {
 
         return dailyWeatherRepository.saveAll(dailyWeatherInRequest);
     }
+
+    private DailyWeatherListDTO listEntity2DTO(List<DailyWeather> dailyForecast) {
+        Location location = dailyForecast.get(0).getId().getLocation();
+
+        DailyWeatherListDTO listDTO = new DailyWeatherListDTO();
+        listDTO.setLocation(location.toString());
+
+        dailyForecast.forEach(dailyWeather -> {
+            listDTO.addDailyWeatherDTO(modelMapper.map(dailyWeather, DailyWeatherDTO.class));
+        });
+
+        return listDTO;
+    }
+
 }

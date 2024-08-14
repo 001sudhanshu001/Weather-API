@@ -27,7 +27,6 @@ public class GeoLocationService {
         }
     }
 
-    // TODO -> Caching on ipAddress
     @Cacheable(value = "locationByIp", key = "#ipAddress")
     public Location getLocationFromIpAddress(String ipAddress) throws GeoLocationException {
         try {

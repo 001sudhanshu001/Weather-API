@@ -1,9 +1,10 @@
 package com.WeatherAPI.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DailyWeatherListDTO {
+public class DailyWeatherListDTO implements Serializable {
 
     private String location;
 

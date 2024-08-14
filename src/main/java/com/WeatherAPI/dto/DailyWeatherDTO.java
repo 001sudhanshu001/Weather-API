@@ -9,11 +9,13 @@ import org.hibernate.validator.constraints.Range;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @ToString
 @JsonPropertyOrder({"day_of_month", "month", "min_temp", "max_temp", "precipitation", "status"})
-public class DailyWeatherDTO {
+public class DailyWeatherDTO implements Serializable {
 
     @Range(min = 1, max = 31, message = "Day of month must be between 1-31")
     @JsonProperty("day_of_month")

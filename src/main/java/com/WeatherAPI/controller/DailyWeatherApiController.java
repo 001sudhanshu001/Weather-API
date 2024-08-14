@@ -40,26 +40,23 @@ public class DailyWeatherApiController {
         String ipAddress = CommonUtility.getIpAddress(request);
 
         Location locationFromIP = locationService.getLocationFromIpAddress(ipAddress);
-        List<DailyWeather> dailyForecast = dailyWeatherService.getByLocation(locationFromIP);
+        DailyWeatherListDTO dto = dailyWeatherService.getByLocation(locationFromIP);
 
-        if (dailyForecast.isEmpty()) {
+        if (dto.getDailyForecast().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        DailyWeatherListDTO dto = listEntity2DTO(dailyForecast);
         return ResponseEntity.ok(addLinksByIP(dto));
     }
 
     @GetMapping("/{locationCode}")
     @RateLimited
     public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode) {
-        List<DailyWeather> dailyForecast = dailyWeatherService.getByLocationCode(locationCode);
+        DailyWeatherListDTO dto = dailyWeatherService.getByLocationCode(locationCode);
 
-        if (dailyForecast.isEmpty()) {
+        if(dto.getDailyForecast().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
-        DailyWeatherListDTO dto = listEntity2DTO(dailyForecast);
 
         return ResponseEntity.ok(addLinksByLocation(dto, locationCode));
     }

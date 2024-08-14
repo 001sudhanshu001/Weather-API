@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "weather_daily")
 @Getter @Setter
-public class DailyWeather {
+public class DailyWeather implements Serializable {
 
     @EmbeddedId
     private DailyWeatherId id = new DailyWeatherId();

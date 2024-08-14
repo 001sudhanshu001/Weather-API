@@ -8,14 +8,12 @@ import com.WeatherAPI.exception.LocationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,12 +43,19 @@ public class LocationService {
                 .map(location -> modelMapper.map(location, LocationDto.class)).toList();
     }
 
-    public Page<Location> listByPage(int pageNum, int pageSize, String sortOption) {
+
+    @Cacheable(value = "locationsPage", key = "#pageNum + '-' + #pageSize + '-' + #sortOption")
+    public Page<LocationDto> listByPage(int pageNum, int pageSize, String sortOption) {
         Sort sort = Sort.by(sortOption).ascending();
 
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 
-        return locationRepository.findUntrashed(pageable);
+        Page<Location> locationPage = locationRepository.findUntrashed(pageable);
+        if(locationPage.isEmpty()) {
+            return null;
+        }
+
+        return convertToDTOPage(locationPage);
     }
 
     @Cacheable(value = "locationDTO", key = "#code")
@@ -86,4 +91,24 @@ public class LocationService {
 
         locationRepository.trashedByCode(code);
     }
+
+    private List<LocationDto> listEntity2ListDTO(List<Location> listEntity) {
+
+        return listEntity.stream().map(this::entity2DTO)
+                .collect(Collectors.toList());
+
+    }
+
+    private LocationDto entity2DTO(Location entity) {
+        return modelMapper.map(entity, LocationDto.class);
+    }
+
+    public Page<LocationDto> convertToDTOPage(Page<Location> locationPage) {
+        List<LocationDto> locationDTOs = locationPage.stream()
+                .map(location -> modelMapper.map(location, LocationDto.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(locationDTOs, locationPage.getPageable(), locationPage.getTotalElements());
+    }
+
 }
