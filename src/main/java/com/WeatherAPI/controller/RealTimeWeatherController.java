@@ -38,7 +38,7 @@ public class RealTimeWeatherController {
         try {
             Location locationFromIpAddress = geoLocationService.getLocationFromIpAddress(ipAddress);
 
-            // Weather we have real Time data about this particular location otherwise throw LocationNotFoundException
+            //  we have real Time data about this particular location otherwise throw LocationNotFoundException
             RealTimeWeatherDto weatherDto = realTimeWeatherService.getWeatherByLocation(locationFromIpAddress);
 
             return ResponseEntity.ok(addLinksByIP(weatherDto));

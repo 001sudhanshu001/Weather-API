@@ -5,6 +5,7 @@ import com.WeatherAPI.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -39,7 +40,25 @@ public class SecurityConfiguration {
                         request -> request.requestMatchers("/api/v1/auth/signin",
                                         "/api/v1/auth/signup", "/api/v1/auth/refresh",
                                         "/api/v1/auth/signin-exclusively").permitAll()
-                                .anyRequest().authenticated()
+                                .requestMatchers("/api/v1/auth/create-administrative-user").hasAuthority("SUPER_ADMIN")
+
+                                .requestMatchers(HttpMethod.POST, "/v1/locations/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/v1/locations/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/v1/locations/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/v1/locations/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+
+                                .requestMatchers(HttpMethod.PUT, "/v1/daily/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/v1/daily/**").permitAll()
+
+                                .requestMatchers(HttpMethod.PUT, "/v1/full/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/v1/full/**").permitAll()
+
+                                .requestMatchers(HttpMethod.PUT, "/v1/realtime/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/v1/realtime/**").permitAll()
+
+                                .requestMatchers(HttpMethod.PUT, "/v1/hourly/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/v1/hourly/**").permitAll()
+
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())

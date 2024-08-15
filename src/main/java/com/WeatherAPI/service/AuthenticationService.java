@@ -37,14 +37,14 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Transactional
-    public JwtAuthenticationResponse signup(SignUpRequest signUpRequest) {
+    public JwtAuthenticationResponse signup(SignUpRequest signUpRequest, Role role) {
 
         AppUser appUser = AppUser.builder()
                 .firstName(signUpRequest.getFirstName())
                 .lastName(signUpRequest.getLastName())
                 .email(signUpRequest.getEmail())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .role(Role.USER)
+                .role(role)
                 .build();
         userRepository.save(appUser);
 
