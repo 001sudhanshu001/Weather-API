@@ -101,6 +101,45 @@ public class LocationApiController {
         return ResponseEntity.ok(addPageMetadata(locationDtos, page, sortField));
     }
 
+    @GetMapping("/{code}")
+    @RateLimited
+    public ResponseEntity<?> getByCode(@PathVariable("code") String code){
+        LocationDto locationDto = service.get(code);
+
+        return ResponseEntity.ok(locationDto);
+    }
+
+    @PutMapping
+    @RateLimited
+    public ResponseEntity<?> updateByCode(@RequestBody @Valid LocationDto locationDto){
+        Location location = modelMapper.map(locationDto, Location.class);
+        Location updatedLocation = service.update(location);
+
+        return ResponseEntity.ok(modelMapper.map(updatedLocation, LocationDto.class));
+    }
+
+    @DeleteMapping("/{code}")
+    public ResponseEntity<?> deleteLocation(@PathVariable("code") String code){
+        service.delete(code);
+        return ResponseEntity.noContent().build();
+    }
+
+    private List<LocationDto> listEntity2ListDTO(List<Location> listEntity) {
+
+        return listEntity.stream().map(this::entity2DTO)
+                .collect(Collectors.toList());
+
+    }
+
+    private LocationDto entity2DTO(Location entity) {
+        return modelMapper.map(entity, LocationDto.class);
+    }
+
+    private Location dto2Entity(LocationDto dto) {
+        return modelMapper.map(dto, Location.class);
+    }
+
+
     private CollectionModel<LocationDto> addPageMetadata(List<LocationDto> listDTO,
                                                          Page<LocationDto> pageInfo, String sortFiled)
             throws BadRequestException {
@@ -147,42 +186,5 @@ public class LocationApiController {
 
     }
 
-    @GetMapping("/{code}")
-    @RateLimited
-    public ResponseEntity<?> getByCode(@PathVariable("code") String code){
-        LocationDto locationDto = service.get(code);
-
-        return ResponseEntity.ok(locationDto);
-    }
-
-    @PutMapping
-    @RateLimited
-    public ResponseEntity<?> updateByCode(@RequestBody @Valid LocationDto locationDto){
-        Location location = modelMapper.map(locationDto, Location.class);
-        Location updatedLocation = service.update(location);
-
-        return ResponseEntity.ok(modelMapper.map(updatedLocation, LocationDto.class));
-    }
-
-    @DeleteMapping("/{code}")
-    public ResponseEntity<?> deleteLocation(@PathVariable("code") String code){
-        service.delete(code);
-        return ResponseEntity.noContent().build();
-    }
-
-    private List<LocationDto> listEntity2ListDTO(List<Location> listEntity) {
-
-        return listEntity.stream().map(this::entity2DTO)
-                .collect(Collectors.toList());
-
-    }
-
-    private LocationDto entity2DTO(Location entity) {
-        return modelMapper.map(entity, LocationDto.class);
-    }
-
-    private Location dto2Entity(LocationDto dto) {
-        return modelMapper.map(dto, Location.class);
-    }
 
 }
